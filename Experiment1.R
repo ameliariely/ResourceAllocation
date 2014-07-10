@@ -1,7 +1,4 @@
-setwd("~/Documents/013-14/Summer 2014/MedIX")
-
-#Testing Git!
-##I am changing stuff
+setwd("~/Documents/013-14/Summer 2014/MedIX/ResourceAllocation")
 
 ## Loading add-on packages
 pack.names <- c("rpart","rpart.plot")
