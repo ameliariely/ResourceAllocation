@@ -86,22 +86,41 @@ train.img <- as.matrix(img_fs[train.index,])
 test.img <- as.matrix(img_fs[test.index,])
 valid.img <- as.matrix(img_fs[valid.index,])
 
-total.miss <- vector(mode="list",length=4)
+#Create consensus label vectors
+#Probably redundant code with the balanced/stratified sampling code
+#Train, test and valid appear in 1, 2, 3 order
+cons.label <- label.selector(labels, rep(4,nrow(labels)))
+train.cons.label <- cons.label[train.index]
+test.cons.label <- cons.label[test.index]
+valid.cons.label <- cons.label[valid.index]
+cons.used.label = c(train.cons.label, test.cons.label, valid.cons.label)
+
+total.iter.miss <- vector(mode="list",length=4)
+total.cons.miss <- vector(mode="list",length=4)
+train.cons.miss <- vector(mode="list",length=4)
+train.iter.miss <- vector(mode="list",length=4)
+test.cons.miss <- vector(mode="list",length=4)
+test.iter.miss <- vector(mode="list",length=4)
+valid.cons.miss <- vector(mode="list",length=4)
+valid.iter.miss <- vector(mode="list",length=4)
 
 ##Iterations
 for(r in 1:4)
 {
-  actual.label <- label.selector(labels,label.tracker)
-  train.actual.label <- actual.label[train.index]
-  test.actual.label <- actual.label[test.index]
-  valid.actual.label <- actual.label[valid.index]
+  
+  #Different iterative label vector for each iteration
+  iter.label <- label.selector(labels,label.tracker)
+  train.iter.label <- iter.label[train.index]
+  test.iter.label <- iter.label[test.index]
+  valid.iter.label <- iter.label[valid.index]
+  iter.used.label <- c(train.iter.label, test.iter.label, valid.iter.label)
   
   #Make dataframes work for decision trees
-  train.data <- data.frame(cbind(train.actual.label, train.img))
+  train.data <- data.frame(cbind(train.iter.label, train.img))
   colnames(train.data)[1] <- "label"
-  test.data <- data.frame(cbind(test.actual.label, test.img))
+  test.data <- data.frame(cbind(test.iter.label, test.img))
   colnames(test.data)[1] <- "label"
-  valid.data <- data.frame(cbind(valid.actual.label, valid.img))
+  valid.data <- data.frame(cbind(valid.iter.label, valid.img))
   colnames(valid.data)[1] <- "label"
   
   #THIS IS WHERE CLASSIFICATION ACTUALLY HAPPENS
@@ -109,28 +128,42 @@ for(r in 1:4)
   train.pred.label <- predict(train.cl.model, train.data, type="class")
   test.pred.label <- predict(train.cl.model, test.data, type="class")
   valid.pred.label <- predict(train.cl.model, valid.data, type="class")
+  unlist(train.pred.label)
+  unlist(test.pred.label)
+  unlist(valid.pred.label)
   
   #Store predicted labels
-  pred.label <- vector(mode="list",length(actual.label))
-  pred.label[train.index] <- train.pred.label
-  pred.label[test.index] <- test.pred.label
-  pred.label[valid.index] <- valid.pred.label
+  pred.label <- c(train.pred.label, test.pred.label, valid.pred.label)
+  unlist(pred.label)
   
-  pred.label <- unlist(pred.label)
-  
-  ## Update the label tracker
-  miss.index <- which(pred.label!= c(actual.label[train.index], 
-                                     actual.label[test.index], 
-                                     actual.label[valid.index]))
-  total.miss[r] <-length(miss.index)
+##Calculate way too many miss indices
+  miss.iter <- which(pred.label!= iter.used.label)
+  miss.cons <- which(pred.label!= cons.used.label)
+  total.iter.miss[r] <-length(miss.iter)
+  total.cons.miss[r] <-length(miss.cons)
+  train.cons.miss[r] <- length(which(train.pred.label!= train.cons.label))
+  test.cons.miss[r] <- length(which(test.pred.label!= test.cons.label))  
+  valid.cons.miss[r] <- length(which(valid.pred.label!= valid.cons.label))  
+  train.iter.miss[r] <- length(which(train.pred.label!= train.iter.label))
+  test.iter.miss[r] <- length(which(test.pred.label!= test.iter.label))  
+  valid.iter.miss[r] <- length(which(valid.pred.label!= valid.iter.label))  
+
+
+## Update the label tracker
   if(r!=4)
   {
-    label.tracker[miss.index] <- label.tracker[miss.index]+1
+    label.tracker[miss.iter] <- label.tracker[miss.iter]+1
   }
   
-  #cp = complexity parameter
-  printcp(train.cl.model) # display the results
-  plotcp(train.cl.model) # visualize cross-validation results
-  summary(train.cl.model) # detailed summary of splits
-  rpart.plot(train.cl.model)
+#   #cp = complexity parameter
+#   printcp(train.cl.model) # display the results
+#   plotcp(train.cl.model) # visualize cross-validation results
+#   summary(train.cl.model) # detailed summary of splits
+#   rpart.plot(train.cl.model)
 }
+
+total.miss <- cbind(total.iter.miss, total.cons.miss, train.cons.miss, 
+                    train.iter.miss, test.cons.miss, test.iter.miss, 
+                    valid.cons.miss, valid.iter.miss)
+
+total.miss
