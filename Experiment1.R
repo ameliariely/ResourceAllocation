@@ -46,10 +46,7 @@ avg.gabor.SD <- (gabor.features$gaborSD_0_0 + gabor.features$gaborSD_0_1 + gabor
 
 avg.gabor.features <- data.frame(avg.gabor.mean, avg.gabor.SD)
 
-avg.gab.data <- data[, -(seq(from = 19, to = 42))]
-avg.gab.data <- data.frame(avg.gab.data, avg.gabor.features)
-
-img_fs <- data[,5:45]
+img_fs <- data[,c(5:18, 43:69)]
 img_fs <- data.frame(img_fs, avg.gabor.features)
 
 ##Process labels
@@ -64,11 +61,6 @@ labels <- apply(labels,c(1,2),rescale)
 
 ## Label tracker
 label.tracker <- rep(1,nrow(labels))
-
-##Separate training and testing
-index <- sample(810,540,replace=FALSE)
-train.img <- as.matrix(img_fs[index,])
-test.img <- as.matrix(img_fs[-index,])
 
 ##Balance
 ones <- which(labels[,4]==1) #201 24.8%
@@ -106,7 +98,7 @@ cons.label <- label.selector(labels, rep(4,nrow(labels)))
 train.cons.label <- cons.label[train.index]
 test.cons.label <- cons.label[test.index]
 valid.cons.label <- cons.label[valid.index]
-cons.used.label = c(train.cons.label, test.cons.label, valid.cons.label)
+cons.used.label <- c(train.cons.label, test.cons.label, valid.cons.label)
 
 total.iter.miss <- vector(mode="list",length=4)
 total.cons.miss <- vector(mode="list",length=4)
@@ -158,8 +150,6 @@ for(r in 1:4)
   train.iter.miss[r] <- length(which(train.pred.label!= train.iter.label))
   test.iter.miss[r] <- length(which(test.pred.label!= test.iter.label))  
   valid.iter.miss[r] <- length(which(valid.pred.label!= valid.iter.label))  
-  
-#   total.iter.acc[r] <- total.iter.miss[r]/
 
 ## Update the label tracker
   if(r!=4)
@@ -178,3 +168,32 @@ total.miss <- rbind(total.iter.miss, total.cons.miss, train.cons.miss,
                     valid.cons.miss, valid.iter.miss)
 
 total.miss
+
+
+#Use same data to generate non-iterative model
+#Cross fingers this model will suck
+#Variable names are the same as above, this might need to be changed
+
+train.data <- data.frame(cbind(train.iter.label, train.img))
+colnames(train.data)[1] <- "label"
+
+train.std.model <- rpart(formula, method = "class", data = train.data)
+train.pred.label <- unlist(predict(train.std.model, train.data, type="class"))
+test.pred.label <- unlist(predict(train.std.model, test.data, type="class"))
+valid.pred.label <- unlist(predict(train.std.model, valid.data, type="class"))
+
+#Store predicted labels
+pred.label <- c(train.pred.label, test.pred.label, valid.pred.label)
+pred.label <- unlist(pred.label)
+
+##Calculate way too many miss indices (only cons this time)
+miss.cons.comp <- which(pred.label!= cons.used.label)
+total.cons.miss.comp <-length(miss.cons)
+train.cons.miss.comp <- length(which(train.pred.label!= train.cons.label))
+test.cons.miss.comp <- length(which(test.pred.label!= test.cons.label))  
+valid.cons.comp <- length(which(valid.pred.label!= valid.cons.label))  
+
+total.miss.comp <- rbind(total.cons.miss.comp, train.cons.miss.comp, 
+                         test.cons.miss.comp, valid.cons.miss.comp)
+
+total.miss.comp
