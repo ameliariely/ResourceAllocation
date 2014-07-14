@@ -119,7 +119,9 @@ for(r in 1:4)
   pred.label <- unlist(pred.label)
   
   ## Update the label tracker
-  miss.index <- which(pred.label!=actual.label[r])
+  miss.index <- which(pred.label!= c(actual.label[train.index], 
+                                     actual.label[test.index], 
+                                     actual.label[valid.index]))
   total.miss[r] <-length(miss.index)
   if(r!=4)
   {
