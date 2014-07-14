@@ -108,16 +108,18 @@ for(r in 1:4)
   train.cl.model <- rpart(formula, method = "class", data = train.data)
   train.pred.label <- predict(train.cl.model, train.data, type="class")
   test.pred.label <- predict(train.cl.model, test.data, type="class")
+  valid.pred.label <- predict(train.cl.model, valid.data, type="class")
   
   #Store predicted labels
   pred.label <- vector(mode="list",length(actual.label))
   pred.label[train.index] <- train.pred.label
   pred.label[test.index] <- test.pred.label
+  pred.label[valid.index] <- valid.pred.label
   
   pred.label <- unlist(pred.label)
   
   ## Update the label tracker
-  miss.index <- which(pred.label!=actual.label)
+  miss.index <- which(pred.label!=actual.label[r])
   total.miss[r] <-length(miss.index)
   if(r!=4)
   {
