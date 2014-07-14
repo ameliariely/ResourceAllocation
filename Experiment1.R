@@ -125,16 +125,13 @@ for(r in 1:4)
   
   #THIS IS WHERE CLASSIFICATION ACTUALLY HAPPENS
   train.cl.model <- rpart(formula, method = "class", data = train.data)
-  train.pred.label <- predict(train.cl.model, train.data, type="class")
-  test.pred.label <- predict(train.cl.model, test.data, type="class")
-  valid.pred.label <- predict(train.cl.model, valid.data, type="class")
-  unlist(train.pred.label)
-  unlist(test.pred.label)
-  unlist(valid.pred.label)
+  train.pred.label <- unlist(predict(train.cl.model, train.data, type="class"))
+  test.pred.label <- unlist(predict(train.cl.model, test.data, type="class"))
+  valid.pred.label <- unlist(predict(train.cl.model, valid.data, type="class"))
   
   #Store predicted labels
   pred.label <- c(train.pred.label, test.pred.label, valid.pred.label)
-  unlist(pred.label)
+  pred.label <- unlist(pred.label)
   
 ##Calculate way too many miss indices
   miss.iter <- which(pred.label!= iter.used.label)
@@ -147,7 +144,8 @@ for(r in 1:4)
   train.iter.miss[r] <- length(which(train.pred.label!= train.iter.label))
   test.iter.miss[r] <- length(which(test.pred.label!= test.iter.label))  
   valid.iter.miss[r] <- length(which(valid.pred.label!= valid.iter.label))  
-
+  
+  total.iter.acc[r] <- total.iter.miss[r]/
 
 ## Update the label tracker
   if(r!=4)
@@ -162,7 +160,7 @@ for(r in 1:4)
 #   rpart.plot(train.cl.model)
 }
 
-total.miss <- cbind(total.iter.miss, total.cons.miss, train.cons.miss, 
+total.miss <- rbind(total.iter.miss, total.cons.miss, train.cons.miss, 
                     train.iter.miss, test.cons.miss, test.iter.miss, 
                     valid.cons.miss, valid.iter.miss)
 
