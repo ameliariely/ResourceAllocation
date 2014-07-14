@@ -1,7 +1,5 @@
-setwd("C://Users/Kyle/Documents/MedIX Stuff/R Work")
-
 ## Loading add-on packages
-pack.names <- c("rpart","rpart.plot")
+pack.names <- c("rpart","rpart.plot", "pROC")
 sapply(pack.names,library,character.only=TRUE)
 
 ##Formula for decision tree with all image features
@@ -55,19 +53,34 @@ Avg.Gabor <- function( dataset )
   return(avg.gab.data)
 }
 
-
-## Loading the data
-data <- read.csv("LIDC dataset with full annotations.csv",header=TRUE)
-combined.data <- Avg.Gabor(data)
-img_fs <- combined.data[,5:45]
-img_fs <- data.frame(img_fs, combined.data[,50:51])
-
-##Process labels
-#currently iterative labeling for both trail and test
-labels <- data[,70:73]
-#shuffles labels
-labels <- t(apply(labels,1,sample))
-#takes the mode for each iteration
-labels <- cbind(labels[,1],apply(labels[,1:2],1,mode),
-                apply(labels[,1:3],1,mode),apply(labels,1,mode))
-labels <- apply(labels,c(1,2),rescale)
+bal_strat <- function(labels){
+  
+  ##Balance
+  ones <- which(labels[,4]==1) #201 24.8%
+  twos <- which(labels[,4]==2) #341 42.1%
+  threes <- which(labels[,4]==3) #268 33.1%
+  
+  #twos will be slightly undersampled 
+  #so that they don't represent more than 
+  #40% of the cases or 324 total
+  #793 is new total case number
+  
+  ##Stratify 60% training, 30% testing, 10% validation
+  train.ones <- sample(201, 121, replace=FALSE)
+  train.twos <- sample(341, 195, replace=FALSE)
+  train.threes <- sample(268, 161, replace=FALSE)
+  train.index <- c(ones[train.ones], twos[train.twos], threes[train.threes])
+  test.ones <- sample(seq(1:201)[-train.ones], 60, replace=FALSE)
+  test.twos <- sample(seq(1:341)[-train.twos], 97, replace=FALSE)
+  test.threes <- sample(seq(1:268)[-train.threes], 80, replace=FALSE)
+  test.index <- c(ones[test.ones], twos[test.twos], threes[test.threes])
+  valid.ones <- sample(seq(1:201)[-c(train.ones, test.ones)], 20,replace=FALSE)
+  valid.twos <- sample(seq(1:341)[-c(train.twos, test.twos)], 32, replace=FALSE)
+  valid.threes <- sample(seq(1:268)[-c(train.threes, test.threes)], 27, replace=FALSE)
+  valid.index <- c(ones[valid.ones], twos[valid.twos], threes[valid.threes])
+  index = NULL
+  index$train = train.index
+  index$test = test.index
+  index$valid = valid.index
+  return (index)
+}
