@@ -187,11 +187,10 @@ pred.label <- c(train.pred.label, test.pred.label, valid.pred.label)
 pred.label <- unlist(pred.label)
 
 ##Calculate way too many miss indices (only cons this time)
-miss.cons.comp <- which(pred.label!= cons.used.label)
-total.cons.miss.comp <-length(miss.cons)
+total.cons.miss.comp <-length(which(pred.label!= cons.used.label))
 train.cons.miss.comp <- length(which(train.pred.label!= train.cons.label))
 test.cons.miss.comp <- length(which(test.pred.label!= test.cons.label))  
-valid.cons.comp <- length(which(valid.pred.label!= valid.cons.label))  
+valid.cons.miss.comp <- length(which(valid.pred.label!= valid.cons.label))  
 
 total.miss.comp <- rbind(total.cons.miss.comp, train.cons.miss.comp, 
                          test.cons.miss.comp, valid.cons.miss.comp)
