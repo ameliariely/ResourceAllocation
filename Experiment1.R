@@ -1,20 +1,20 @@
 setwd("~/Documents/013-14/Summer 2014/MedIX/ResourceAllocation")
 
 ## Loading add-on packages
-pack.names <- c("rpart","rpart.plot")
+pack.names <- c("rpart","rpart.plot", "pROC")
 sapply(pack.names,library,character.only=TRUE)
 
 ##Formula for decision tree with all image features
 formula = as.formula("label ~ markov1 + markov2 + markov3 + markov4 + markov5 + 
                          SDIntensity + SDIntensityBG + IntensityDifference + gabormean_0_0 + 
-                         gaborSD_0_0 + gabormean_0_1 + gaborSD_0_1 + gabormean_0_2 + gaborSD_0_2
-                          + gabormean_1_0 + gaborSD_1_0 + gabormean_1_1 + gaborSD_1_1
-                          + gabormean_1_2 + gaborSD_1_2 + gabormean_2_0 + gaborSD_2_0
-                          + gabormean_2_1 + gaborSD_2_1 + gabormean_2_2 + gaborSD_2_2 + 
+                         gaborSD_0_0 + gabormean_0_1 + gaborSD_0_1 + gabormean_0_2 + gaborSD_0_2 +
+                        gabormean_1_0 + gaborSD_1_0 + gabormean_1_1 + gaborSD_1_1 +
+                        gabormean_1_2 + gaborSD_1_2 + gabormean_2_0 + gaborSD_2_0 +
+                          gabormean_2_1 + gaborSD_2_1 + gabormean_2_2 + gaborSD_2_2 + 
                          gabormean_3_0 + gaborSD_3_0 + gabormean_3_1 + gaborSD_3_1 + gabormean_3_2 + 
                          Energy + Homogeneity + Entropy + thirdordermoment + Inversevariance + 
-                         Sumaverage + Variance + Clustertendency + MaxProbability + Circularity
-                          + Compactness + Eccentricity + Solidity + Extent + RadialDistanceSD + 
+                         Sumaverage + Variance + Clustertendency + MaxProbability + Circularity +
+                        Compactness + Eccentricity + Solidity + Extent + RadialDistanceSD + 
                          SecondMoment + Area + ConvexArea + Perimeter + ConvexPerimeter + 
                          EquivDiameter + MajorAxisLength + MinorAxisLength")
 
@@ -128,6 +128,7 @@ for(r in 1:4)
   train.pred.label <- unlist(predict(train.cl.model, train.data, type="class"))
   test.pred.label <- unlist(predict(train.cl.model, test.data, type="class"))
   valid.pred.label <- unlist(predict(train.cl.model, valid.data, type="class"))
+
   
   #Store predicted labels
   pred.label <- c(train.pred.label, test.pred.label, valid.pred.label)
@@ -145,7 +146,7 @@ for(r in 1:4)
   test.iter.miss[r] <- length(which(test.pred.label!= test.iter.label))  
   valid.iter.miss[r] <- length(which(valid.pred.label!= valid.iter.label))  
   
-  total.iter.acc[r] <- total.iter.miss[r]/
+#   total.iter.acc[r] <- total.iter.miss[r]/
 
 ## Update the label tracker
   if(r!=4)
@@ -155,7 +156,6 @@ for(r in 1:4)
   
 #   #cp = complexity parameter
 #   printcp(train.cl.model) # display the results
-#   plotcp(train.cl.model) # visualize cross-validation results
 #   summary(train.cl.model) # detailed summary of splits
 #   rpart.plot(train.cl.model)
 }
