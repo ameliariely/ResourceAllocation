@@ -197,3 +197,24 @@ comp$valid$one <- roc(response = valid$one$consl, predictor = valid$one$compl,
 comp$valid$three <- roc(response = valid$three$consl, predictor = valid$three$compl, 
                                      auc =TRUE,  plot = TRUE, ci = TRUE)
 comp$valid$multi <- multiclass.roc(response = valid$consl, predictor = valid$compl)
+
+#Confusion Matrix Stuff
+#Select the the ones that you want to output
+
+##Ones
+#confusionMatrix(texp$one$consl, texp$one$compl)
+#confusionMatrix(train$one$consl, train$one$compl)
+#confusionMatrix(test$one$consl, test$one$compl)
+#confusionMatrix(valid$one$consl, valid$one$compl)
+
+##Threes
+#confusionMatrix(texp$three$consl, texp$three$compl)
+#confusionMatrix(train$three$consl, train$three$compl)
+#confusionMatrix(test$three$consl, test$three$compl)
+#confusionMatrix(valid$three$consl, valid$three$compl)
+
+##Multi
+#confusionMatrix(texp$consl, texp$compl)
+#confusionMatrix(train$consl, train$compl)
+#confusionMatrix(test$consl, test$compl)
+#confusionMatrix(valid$consl, valid$compl)
