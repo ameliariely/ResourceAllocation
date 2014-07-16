@@ -62,10 +62,7 @@ Avg.Gabor <- function( dataset )
                    + gabor.features$gaborSD_3_0 + gabor.features$gaborSD_3_1 + gabor.features$gaborSD_3_2)/12
   
   avg.gabor.features <- data.frame(avg.gabor.mean, avg.gabor.SD)
-  
-  avg.gab.data <- data[, -(seq(from = 19, to = 42))]
-  avg.gab.data <- data.frame(avg.gab.data, avg.gabor.features)
-  return(avg.gab.data)
+  return(avg.gabor.features)
 }
 
 ##Only works for this specific dataset
