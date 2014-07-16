@@ -27,6 +27,7 @@ test = NULL
 valid = NULL
 texp = NULL
 results = NULL
+comp = NULL
 
 #Separate training, testing and valid
 index <- bal_strat(labels)
@@ -161,46 +162,38 @@ valid$compl <- as.integer(predict(texp$compm, valid$data, type="class"))
 texp$compl <- c(train$compl, test$compl, valid$compl)
 
 texp$one$compl <- rescale1(texp$compl)
-texp$one$consl <- rescale1(texp$consl)
 texp$three$compl <- rescale3(texp$compl)
-texp$three$consl <- rescale3(texp$consl)
 
 #Calculate ROC
-results$texp$one[[r]] <- roc(response = texp$one$consl, predictor = texp$one$compl, 
+comp$texp$one[[r]] <- roc(response = texp$one$consl, predictor = texp$one$compl, 
                              auc =TRUE,  plot = TRUE, ci = TRUE)
-results$texp$three[[r]] <- roc(response = texp$three$consl, predictor = texp$three$compl, 
+comp$texp$three[[r]] <- roc(response = texp$three$consl, predictor = texp$three$compl, 
                                auc =TRUE,  plot = TRUE, ci = TRUE)
-results$texp$multi[[r]] <- multiclass.roc(response = texp$consl, predictor = texp$compl)
+comp$texp$multi[[r]] <- multiclass.roc(response = texp$consl, predictor = texp$compl)
 
 #Repeat with train
 train$one$compl <- rescale1(train$compl)
-train$one$consl <- rescale1(train$consl)
 train$three$compl <- rescale3(train$compl)
-train$three$consl <- rescale3(train$consl)
-results$train$cons$one[[r]] <- roc(response = train$one$consl, predictor = train$one$compl, 
+comp$train$cons$one[[r]] <- roc(response = train$one$consl, predictor = train$one$compl, 
                                    auc =TRUE,  plot = TRUE, ci = TRUE)
-results$train$cons$three[[r]] <- roc(response = train$three$consl, predictor = train$three$compl, 
+comp$train$cons$three[[r]] <- roc(response = train$three$consl, predictor = train$three$compl, 
                                      auc =TRUE,  plot = TRUE, ci = TRUE)
-results$train$cons$multi[[r]] <- multiclass.roc(response = train$consl, predictor = train$compl)
+comp$train$cons$multi[[r]] <- multiclass.roc(response = train$consl, predictor = train$compl)
 
 #Repeat with test
 test$one$compl <- rescale1(test$compl)
-test$one$consl <- rescale1(test$consl)
 test$three$compl <- rescale3(test$compl)
-test$three$consl <- rescale3(test$consl)
-results$test$cons$one[[r]] <- roc(response = test$one$consl, predictor = test$one$compl, 
+comp$test$cons$one[[r]] <- roc(response = test$one$consl, predictor = test$one$compl, 
                                   auc =TRUE,  plot = TRUE, ci = TRUE)
-results$test$cons$three[[r]] <- roc(response = test$three$consl, predictor = test$three$compl, 
+comp$test$cons$three[[r]] <- roc(response = test$three$consl, predictor = test$three$compl, 
                                     auc =TRUE,  plot = TRUE, ci = TRUE)
-results$test$cons$multi[[r]] <- multiclass.roc(response = test$consl, predictor = test$compl)
+comp$test$cons$multi[[r]] <- multiclass.roc(response = test$consl, predictor = test$compl)
 
 #Repeat with valid
 valid$one$compl <- rescale1(valid$compl)
-valid$one$consl <- rescale1(valid$consl)
 valid$three$compl <- rescale3(valid$compl)
-valid$three$consl <- rescale3(valid$consl)
-results$valid$cons$one[[r]] <- roc(response = valid$one$consl, predictor = valid$one$compl, 
+comp$valid$cons$one[[r]] <- roc(response = valid$one$consl, predictor = valid$one$compl, 
                                    auc =TRUE,  plot = TRUE, ci = TRUE)
-results$valid$cons$three[[r]] <- roc(response = valid$three$consl, predictor = valid$three$compl, 
+comp$valid$cons$three[[r]] <- roc(response = valid$three$consl, predictor = valid$three$compl, 
                                      auc =TRUE,  plot = TRUE, ci = TRUE)
-results$valid$cons$multi[[r]] <- multiclass.roc(response = valid$consl, predictor = valid$compl)
+comp$valid$cons$multi[[r]] <- multiclass.roc(response = valid$consl, predictor = valid$compl)
