@@ -63,83 +63,88 @@ for(r in 1:4)
   
   #THIS IS WHERE CLASSIFICATION ACTUALLY HAPPENS
   texp$model <- rpart(formula, method = "class", data = train$data)
-  train$predl <- as.integer(predict(texp$model, train$data, type="class"))
-  test$predl <- as.integer(predict(texp$model, test$data, type="class"))
-  valid$predl <- as.integer(predict(texp$model, valid$data, type="class"))
-  texp$predl <- c(train$predl, test$predl, valid$predl)
+  train$compl <- as.integer(predict(texp$model, train$data, type="class"))
+  test$compl <- as.integer(predict(texp$model, test$data, type="class"))
+  valid$compl <- as.integer(predict(texp$model, valid$data, type="class"))
+  texp$compl <- c(train$compl, test$compl, valid$compl)
   
   ##Analyze
-  texp$misscases$iter[[r]] <- which(texp$predl != texp$iterl)
-  texp$misscases$cons[[r]] <- which(texp$predl != texp$consl)
+  texp$misscases$iter[[r]] <- which(texp$compl != texp$iterl)
+  texp$misscases$cons[[r]] <- which(texp$compl != texp$consl)
   
   #Binarize in both directions for ROC
-  texp$one$predl <- rescale1(texp$predl)
+  texp$one$compl <- rescale1(texp$compl)
   texp$one$consl <- rescale1(texp$consl)
   texp$one$iterl <- rescale1(texp$iterl)
-  texp$three$predl <- rescale3(texp$predl)
+  texp$three$compl <- rescale3(texp$compl)
   texp$three$consl <- rescale3(texp$consl)
   texp$three$iterl <- rescale3(texp$iterl)
   
   #Calculate ROC
-  results$texp$one[[r]] <- roc(response = texp$one$consl, predictor = texp$one$predl, 
-            auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$texp$three[[r]] <- roc(response = texp$three$consl, predictor = texp$three$predl, 
-                               auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$texp$multi[[r]] <- multiclass.roc(response = texp$consl, predictor = texp$predl)
+  results$texp$cons$one[[r]] <- roc(response = texp$one$consl, predictor = texp$one$compl, 
+                                     auc =TRUE,  plot = TRUE, ci = TRUE)
+  results$texp$cons$three[[r]] <- roc(response = texp$three$consl, predictor = texp$three$compl, 
+                                       auc =TRUE,  plot = TRUE, ci = TRUE)
+  results$texp$iter$one[[r]] <- roc(response = texp$one$iterl, predictor = texp$one$compl, 
+                                     auc =TRUE,  plot = TRUE, ci = TRUE)
+  results$texp$iter$three[[r]] <- roc(response = texp$three$iterl, predictor = texp$three$compl, 
+                                       auc =TRUE,  plot = TRUE, ci = TRUE)
+  results$texp$cons$multi[[r]] <- multiclass.roc(response = texp$consl, predictor = texp$compl)
+  results$texp$iter$multi[[r]] <- multiclass.roc(response = texp$iterl, predictor = texp$compl)
   
   #Repeat with train
-  train$one$predl <- rescale1(train$predl)
+  train$one$compl <- rescale1(train$compl)
   train$one$consl <- rescale1(train$consl)
   train$one$iterl <- rescale1(train$iterl)
-  train$three$predl <- rescale3(train$predl)
+  train$three$compl <- rescale3(train$compl)
   train$three$consl <- rescale3(train$consl)
   train$three$iterl <- rescale3(train$iterl)
-  results$train$cons$one[[r]] <- roc(response = train$one$consl, predictor = train$one$predl, 
+  results$train$cons$one[[r]] <- roc(response = train$one$consl, predictor = train$one$compl, 
                                      auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$train$cons$three[[r]] <- roc(response = train$three$consl, predictor = train$three$predl, 
+  results$train$cons$three[[r]] <- roc(response = train$three$consl, predictor = train$three$compl, 
                                        auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$train$iter$one[[r]] <- roc(response = train$one$iterl, predictor = train$one$predl, 
+  results$train$iter$one[[r]] <- roc(response = train$one$iterl, predictor = train$one$compl, 
                                      auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$train$iter$three[[r]] <- roc(response = train$three$iterl, predictor = train$three$predl, 
+  results$train$iter$three[[r]] <- roc(response = train$three$iterl, predictor = train$three$compl, 
                                        auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$train$cons$multi[[r]] <- multiclass.roc(response = train$consl, predictor = train$predl)
-  results$train$iter$multi[[r]] <- multiclass.roc(response = train$iterl, predictor = train$predl)
+  results$train$cons$multi[[r]] <- multiclass.roc(response = train$consl, predictor = train$compl)
+  results$train$iter$multi[[r]] <- multiclass.roc(response = train$iterl, predictor = train$compl)
   
   #Repeat with test
-  test$one$predl <- rescale1(test$predl)
+  test$one$compl <- rescale1(test$compl)
   test$one$consl <- rescale1(test$consl)
   test$one$iterl <- rescale1(test$iterl)
-  test$three$predl <- rescale3(test$predl)
+  test$three$compl <- rescale3(test$compl)
   test$three$consl <- rescale3(test$consl)
   test$three$iterl <- rescale3(test$iterl)
-  results$test$cons$one[[r]] <- roc(response = test$one$consl, predictor = test$one$predl, 
+  results$test$cons$one[[r]] <- roc(response = test$one$consl, predictor = test$one$compl, 
                                      auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$test$cons$three[[r]] <- roc(response = test$three$consl, predictor = test$three$predl, 
+  results$test$cons$three[[r]] <- roc(response = test$three$consl, predictor = test$three$compl, 
                                        auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$test$iter$one[[r]] <- roc(response = test$one$iterl, predictor = test$one$predl, 
+  results$test$iter$one[[r]] <- roc(response = test$one$iterl, predictor = test$one$compl, 
                                      auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$test$iter$three[[r]] <- roc(response = test$three$iterl, predictor = test$three$predl, 
+  results$test$iter$three[[r]] <- roc(response = test$three$iterl, predictor = test$three$compl, 
                                        auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$test$cons$multi[[r]] <- multiclass.roc(response = test$consl, predictor = test$predl)
-  results$test$iter$multi[[r]] <- multiclass.roc(response = test$iterl, predictor = test$predl)
+  results$test$cons$multi[[r]] <- multiclass.roc(response = test$consl, predictor = test$compl)
+  results$test$iter$multi[[r]] <- multiclass.roc(response = test$iterl, predictor = test$compl)
   
   #Repeat with valid
-  valid$one$predl <- rescale1(valid$predl)
+  valid$one$compl <- rescale1(valid$compl)
   valid$one$consl <- rescale1(valid$consl)
   valid$one$iterl <- rescale1(valid$iterl)
-  valid$three$predl <- rescale3(valid$predl)
+  valid$three$compl <- rescale3(valid$compl)
   valid$three$consl <- rescale3(valid$consl)
   valid$three$iterl <- rescale3(valid$iterl)
-  results$valid$cons$one[[r]] <- roc(response = valid$one$consl, predictor = valid$one$predl, 
+  results$valid$cons$one[[r]] <- roc(response = valid$one$consl, predictor = valid$one$compl, 
                                auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$valid$cons$three[[r]] <- roc(response = valid$three$consl, predictor = valid$three$predl, 
+  results$valid$cons$three[[r]] <- roc(response = valid$three$consl, predictor = valid$three$compl, 
                                  auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$valid$iter$one[[r]] <- roc(response = valid$one$iterl, predictor = valid$one$predl, 
+  results$valid$iter$one[[r]] <- roc(response = valid$one$iterl, predictor = valid$one$compl, 
                                 auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$valid$iter$three[[r]] <- roc(response = valid$three$iterl, predictor = valid$three$predl, 
+  results$valid$iter$three[[r]] <- roc(response = valid$three$iterl, predictor = valid$three$compl, 
                                   auc =TRUE,  plot = TRUE, ci = TRUE)
-  results$valid$cons$multi[[r]] <- multiclass.roc(response = valid$consl, predictor = valid$predl)
-  results$valid$iter$multi[[r]] <- multiclass.roc(response = valid$iterl, predictor = valid$predl)
+  results$valid$cons$multi[[r]] <- multiclass.roc(response = valid$consl, predictor = valid$compl)
+  results$valid$iter$multi[[r]] <- multiclass.roc(response = valid$iterl, predictor = valid$compl)
   
   ## Update the label tracker
   if(r!=4)
@@ -148,4 +153,54 @@ for(r in 1:4)
   }
 }
 
+##Comparison against consensus build model
+texp$compm <- rpart(formula, method = "class", data = train$data)
+train$compl <- as.integer(predict(texp$compm, train$data, type="class"))
+test$compl <- as.integer(predict(texp$compm, test$data, type="class"))
+valid$compl <- as.integer(predict(texp$compm, valid$data, type="class"))
+texp$compl <- c(train$compl, test$compl, valid$compl)
 
+texp$one$compl <- rescale1(texp$compl)
+texp$one$consl <- rescale1(texp$consl)
+texp$three$compl <- rescale3(texp$compl)
+texp$three$consl <- rescale3(texp$consl)
+
+#Calculate ROC
+results$texp$one[[r]] <- roc(response = texp$one$consl, predictor = texp$one$compl, 
+                             auc =TRUE,  plot = TRUE, ci = TRUE)
+results$texp$three[[r]] <- roc(response = texp$three$consl, predictor = texp$three$compl, 
+                               auc =TRUE,  plot = TRUE, ci = TRUE)
+results$texp$multi[[r]] <- multiclass.roc(response = texp$consl, predictor = texp$compl)
+
+#Repeat with train
+train$one$compl <- rescale1(train$compl)
+train$one$consl <- rescale1(train$consl)
+train$three$compl <- rescale3(train$compl)
+train$three$consl <- rescale3(train$consl)
+results$train$cons$one[[r]] <- roc(response = train$one$consl, predictor = train$one$compl, 
+                                   auc =TRUE,  plot = TRUE, ci = TRUE)
+results$train$cons$three[[r]] <- roc(response = train$three$consl, predictor = train$three$compl, 
+                                     auc =TRUE,  plot = TRUE, ci = TRUE)
+results$train$cons$multi[[r]] <- multiclass.roc(response = train$consl, predictor = train$compl)
+
+#Repeat with test
+test$one$compl <- rescale1(test$compl)
+test$one$consl <- rescale1(test$consl)
+test$three$compl <- rescale3(test$compl)
+test$three$consl <- rescale3(test$consl)
+results$test$cons$one[[r]] <- roc(response = test$one$consl, predictor = test$one$compl, 
+                                  auc =TRUE,  plot = TRUE, ci = TRUE)
+results$test$cons$three[[r]] <- roc(response = test$three$consl, predictor = test$three$compl, 
+                                    auc =TRUE,  plot = TRUE, ci = TRUE)
+results$test$cons$multi[[r]] <- multiclass.roc(response = test$consl, predictor = test$compl)
+
+#Repeat with valid
+valid$one$compl <- rescale1(valid$compl)
+valid$one$consl <- rescale1(valid$consl)
+valid$three$compl <- rescale3(valid$compl)
+valid$three$consl <- rescale3(valid$consl)
+results$valid$cons$one[[r]] <- roc(response = valid$one$consl, predictor = valid$one$compl, 
+                                   auc =TRUE,  plot = TRUE, ci = TRUE)
+results$valid$cons$three[[r]] <- roc(response = valid$three$consl, predictor = valid$three$compl, 
+                                     auc =TRUE,  plot = TRUE, ci = TRUE)
+results$valid$cons$multi[[r]] <- multiclass.roc(response = valid$consl, predictor = valid$compl)
