@@ -17,9 +17,9 @@ labels <- apply(labels,c(1,2),rescale)
 
 ## Label tracker
 label.tracker <- rep(1,nrow(labels))
-texp$misscases$cons <- vector(mode="list",length=4)
-texp$misscases$iter <- vector(mode="list",length=4)
-curve <- vector(mode="list",length=4)
+texp$misscases$cons <- list()
+texp$misscases$iter <- list()
+curve <- list()
 
 #New objects
 #texp = total experiment (doesn't include unsampled cases)
@@ -69,8 +69,8 @@ for(r in 1:4)
   texp$predl <- c(train$predl, test$predl, valid$predl)
   
   ##Analyze
-  texp$misscases$iter[r] <- which(texp$predl != texp$iterl)
-  texp$misscases$cons[r] <- which(texp$predl != texp$consl)
+  texp$misscases$iter[[r]] <- which(texp$predl != texp$iterl)
+  texp$misscases$cons[[r]] <- which(texp$predl != texp$consl)
   
   #Binarize in both directions for ROC
   texp$one$predl <- rescale1(texp$predl)
@@ -80,11 +80,13 @@ for(r in 1:4)
   texp$three$consl <- rescale3(texp$consl)
   texp$three$iterl <- rescale3(texp$iterl)
   
-  curve[r] <- roc(texp$one$consl, texp$one$predl)
+  curve[[r]] <- roc(response = texp$one$consl, predictor = texp$one$predl, plot = TRUE)
   
   ## Update the label tracker
   if(r!=4)
   {
-    label.tracker[texp$misscases$iter] <- label.tracker[texp$misscases$iter]+1
+    label.tracker[texp$misscases$iter[[r]]] <- label.tracker[texp$misscases$iter[[r]]]+1
   }
 }
+
+
