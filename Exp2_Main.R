@@ -43,6 +43,10 @@ test$consl <- labels[index$test, 4]
 valid$consl <- labels[index$valid, 4]
 texp$consl <- c(train$consl, test$consl, valid$consl)
 
+train.Acc <- list()
+test.Acc <- list()
+valid.Acc <- list()
+
 ##Iterations
 for(r in 1:4)
 {
@@ -147,6 +151,10 @@ for(r in 1:4)
   results$valid$cons$multi[[r]] <- multiclass.roc(response = valid$consl, predictor = valid$compl)
   results$valid$iter$multi[[r]] <- multiclass.roc(response = valid$iterl, predictor = valid$compl)
   
+  train.Acc[[r]] <- confusionMatrix(train$iterl, train$compl)$overall
+  test.Acc[[r]] <- confusionMatrix(test$consl, test$compl)$overall
+  valid.Acc[[r]] <- confusionMatrix(valid$consl, valid$compl)$overall
+  
   ## Update the label tracker
   if(r!=4)
   {
@@ -198,23 +206,3 @@ comp$valid$three <- roc(response = valid$three$consl, predictor = valid$three$co
                                      auc =TRUE,  plot = TRUE, ci = TRUE)
 comp$valid$multi <- multiclass.roc(response = valid$consl, predictor = valid$compl)
 
-#Confusion Matrix Stuff
-#Select the the ones that you want to output
-
-##Ones
-#confusionMatrix(texp$one$consl, texp$one$compl)
-#confusionMatrix(train$one$consl, train$one$compl)
-#confusionMatrix(test$one$consl, test$one$compl)
-#confusionMatrix(valid$one$consl, valid$one$compl)
-
-##Threes
-#confusionMatrix(texp$three$consl, texp$three$compl)
-#confusionMatrix(train$three$consl, train$three$compl)
-#confusionMatrix(test$three$consl, test$three$compl)
-#confusionMatrix(valid$three$consl, valid$three$compl)
-
-##Multi
-#confusionMatrix(texp$consl, texp$compl)
-#confusionMatrix(train$consl, train$compl)
-#confusionMatrix(test$consl, test$compl)
-#confusionMatrix(valid$consl, valid$compl)
