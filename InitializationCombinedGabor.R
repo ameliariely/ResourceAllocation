@@ -32,6 +32,21 @@ rescale <- function(x)
   return(value)
 }
 
+#1 and 2 are benign, 3 is malignant for ROC
+rescale1 <- function(x)
+{
+  value <- ifelse(x==1|x==2,0, 1)
+  return(value)
+}
+
+#1 is benign, 2&3 are malignant
+rescale3 <- function(x)
+{
+  value <- ifelse(x==2|x==3,1, 0)
+  return(value)
+}
+
+#Only works for this specific dataset
 Avg.Gabor <- function( dataset )
 {
   gabor.features <- dataset[, 19:42]
@@ -53,6 +68,7 @@ Avg.Gabor <- function( dataset )
   return(avg.gab.data)
 }
 
+##Only works for this specific dataset
 bal_strat <- function(labels){
   
   ##Balance
@@ -79,8 +95,8 @@ bal_strat <- function(labels){
   valid.threes <- sample(seq(1:268)[-c(train.threes, test.threes)], 27, replace=FALSE)
   valid.index <- c(ones[valid.ones], twos[valid.twos], threes[valid.threes])
   index = NULL
-  index$train = train.index
-  index$test = test.index
-  index$valid = valid.index
+  index$train = as.numeric(train.index)
+  index$test = as.numeric(test.index)
+  index$valid = as.numeric(valid.index)
   return (index)
 }
