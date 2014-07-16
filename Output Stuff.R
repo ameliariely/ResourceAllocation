@@ -25,3 +25,5 @@ nMatrix(train$one$consl, train$one$compl)
 #confusionMatrix(train$consl, train$compl)
 #confusionMatrix(test$consl, test$compl)
 #confusionMatrix(valid$consl, valid$compl)
+
+hello aosdjfoiaj
