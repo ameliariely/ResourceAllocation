@@ -5,7 +5,12 @@
 
 ##Ones
 #confusionMatrix(texp$one$consl, texp$one$compl)
-#confusionMatrix(train$one$consl, train$one$compl)
+#confusio
+
+
+
+
+nMatrix(train$one$consl, train$one$compl)
 #confusionMatrix(test$one$consl, test$one$compl)
 #confusionMatrix(valid$one$consl, valid$one$compl)
 
