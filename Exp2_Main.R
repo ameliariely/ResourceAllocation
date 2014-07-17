@@ -162,6 +162,14 @@ for(r in 1:4)
   }
 }
 
+#Make dataframes work for decision trees
+train$data <- data.frame(cbind(train$consl, train$img))
+colnames(train$data)[1] <- "label"
+test$data <- data.frame(cbind(test$consl, test$img))
+colnames(test$data)[1] <- "label"
+valid$data <- data.frame(cbind(valid$consl, valid$img))
+colnames(valid$data)[1] <- "label"
+
 ##Comparison against consensus build model
 texp$compm <- rpart(formula, method = "class", data = train$data)
 train$compl <- as.integer(predict(texp$compm, train$data, type="class"))
