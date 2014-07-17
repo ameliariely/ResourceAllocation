@@ -206,3 +206,6 @@ comp$valid$three <- roc(response = valid$three$consl, predictor = valid$three$co
                                      auc =TRUE,  plot = TRUE, ci = TRUE)
 comp$valid$multi <- multiclass.roc(response = valid$consl, predictor = valid$compl)
 
+train.Acc[[5]] <- confusionMatrix(train$consl, train$compl)$overall
+test.Acc[[5]] <- confusionMatrix(test$consl, test$compl)$overall
+valid.Acc[[5]] <- confusionMatrix(valid$consl, valid$compl)$overall
