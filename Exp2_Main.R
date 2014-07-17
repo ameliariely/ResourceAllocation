@@ -74,6 +74,8 @@ for(r in 1:4)
   valid$predl <- as.integer(predict(texp$model, valid$data, type="class"))
   texp$predl <- c(train$predl, test$predl, valid$predl)
   
+  rpart.plot(texp$model)
+  
   ##Analyze
   texp$misscases$iter[[r]] <- which(texp$predl != texp$iterl)
   texp$misscases$cons[[r]] <- which(texp$predl != texp$consl)
@@ -221,3 +223,5 @@ comp$valid$multi <- multiclass.roc(response = valid$consl, predictor = valid$com
 train.Acc[[5]] <- confusionMatrix(train$consl, train$compl)$overall
 test.Acc[[5]] <- confusionMatrix(test$consl, test$compl)$overall
 valid.Acc[[5]] <- confusionMatrix(valid$consl, valid$compl)$overall
+
+rpart.plot(texp$compl)
