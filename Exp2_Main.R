@@ -17,6 +17,7 @@ labels <- apply(labels,c(1,2),rescale)
 
 ## Label tracker
 label.tracker <- rep(1,nrow(labels))
+labelsum <- list()
 texp$misscases$cons <- list()
 texp$misscases$iter <- list()
 
@@ -154,6 +155,9 @@ for(r in 1:4)
   train.Acc[[r]] <- confusionMatrix(train$iterl, train$predl)$overall
   test.Acc[[r]] <- confusionMatrix(test$consl, test$predl)$overall
   valid.Acc[[r]] <- confusionMatrix(valid$consl, valid$predl)$overall
+  
+  #sum labels at used indices
+  labelsum[[r]] = sum(label.tracker[c(index$train, index$test, index$valid)])
   
   ## Update the label tracker
   if(r!=4)
