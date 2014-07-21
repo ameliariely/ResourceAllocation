@@ -1,5 +1,5 @@
 ## Loading add-on packages
-pack.names <- c("rpart","rpart.plot", "pROC", "caret")
+pack.names <- c("rpart","rpart.plot", "pROC", "caret", "RWeka")
 sapply(pack.names,library,character.only=TRUE)
 
 ##Formula for decision tree with all image features
@@ -28,7 +28,7 @@ mode <- function(x)
 
 rescale <- function(x)
 {
-  value <- ifelse(x==1|x==2,1, ifelse( x==3, 2, 3))
+  value <- ifelse(x==1|x==2,'benign', ifelse( x==3, 'intermediate', 'malignant'))
   return(value)
 }
 
