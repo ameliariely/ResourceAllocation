@@ -20,6 +20,7 @@ label.tracker <- rep(1,nrow(labels))
 labelsum <- list()
 texp$misscases$cons <- list()
 texp$misscases$iter <- list()
+plots <- list()
 
 #New objects
 #texp = total experiment (doesn't include unsampled cases)
@@ -74,7 +75,9 @@ for(r in 1:4)
   valid$predl <- as.integer(predict(texp$model, valid$data, type="class"))
   texp$predl <- c(train$predl, test$predl, valid$predl)
   
-  rpart.plot(texp$model)
+  png(paste('rplot', r, '.png', sep = ''))
+ rpart.plot(texp$model)
+ dev.off()
   
   ##Analyze
   texp$misscases$iter[[r]] <- which(texp$predl != texp$iterl)
@@ -224,4 +227,6 @@ train.Acc[[5]] <- confusionMatrix(train$consl, train$compl)$overall
 test.Acc[[5]] <- confusionMatrix(test$consl, test$compl)$overall
 valid.Acc[[5]] <- confusionMatrix(valid$consl, valid$compl)$overall
 
-rpart.plot(texp$compl)
+png('rplot5.png')
+rpart.plot(texp$compm)
+dev.off()
