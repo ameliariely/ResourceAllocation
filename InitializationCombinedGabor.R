@@ -1,5 +1,6 @@
 ## Loading add-on packages
-pack.names <- c("rpart","rpart.plot", "pROC", "caret", "RWeka")
+pack.names <- c("rpart","rpart.plot", "pROC", "caret", "RWeka", "ROCR")
+require(plyr)
 sapply(pack.names,library,character.only=TRUE)
 
 ##Formula for decision tree with all image features

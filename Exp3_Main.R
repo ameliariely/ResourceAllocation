@@ -77,7 +77,7 @@ for(r in 1:4)
     #Different calculations of "Actual Label"
     miss.rest <- which(results[c(index$test, index$valid) ,paste("I", r, ".Pred", sep = "")]!=
                           results[c(index$test, index$valid) , "Max.Mode"])
-    label.tracker[miss.index] <- label.tracker[miss.index]+1
-    results[miss.index, paste("I", r, ".Label.Added", sep = "")] <- TRUE
+    label.tracker[c(miss.train, miss.rest)] <- label.tracker[c(miss.train, miss.rest)]+1
+    results[c(miss.train, miss.rest), paste("I", r, ".Label.Added", sep = "")] <- TRUE
   }
 }
