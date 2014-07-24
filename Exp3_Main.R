@@ -1,0 +1,83 @@
+##Absolutely necessary to run initialization BEFORE this file
+
+##Import data
+data <- read.csv("LIDC dataset with full annotations.csv",header=TRUE)
+img_fs <- data[,c(5:18, 43:69)]
+img_fs <- data.frame(img_fs, Avg.Gabor(data))
+
+#Df for results
+col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set", 
+          "I1 Label", "I1 Pred", "I1 Label Added", "I2 Label", 
+          "I2 Pred","I2 Label Added", "I3 Label", "I3 Pred",
+          "I3 Label Added", "I4 Label", "I4 Pred")
+results <- data.frame(data.frame(matrix(vector(), 810, 16, dimnames=list(c(), col))))
+
+##Process labels
+#currently iterative labeling for both trail and test
+labels <- data[,70:73]
+#shuffles labels
+labels <- t(apply(labels,1,sample))
+#takes the mode for each iteration
+labels <- cbind(labels[,1],apply(labels[,1:2],1,mode),
+                apply(labels[,1:3],1,mode),apply(labels,1,mode))
+labels <- apply(labels,c(1,2),rescale)
+results[1:4] <- labels
+
+## Label tracker
+label.tracker <- rep(1,nrow(labels))
+labelsum <- list()
+
+#Separate training, testing and valid
+index <- bal_strat(labels)
+
+#Get image features
+train = NULL
+test = NULL
+valid = NULL
+models = vector(mode="list",length=70)
+#5 * 14
+train$img <- as.matrix(img_fs[index$train,])
+test$img <- as.matrix(img_fs[index$test,])
+valid$img <- as.matrix(img_fs[index$valid,])
+
+##Iterations
+for(r in 1:4)
+{
+  set.seed(r)
+  #Different iterative label vector for each iteration
+  iterlabel <- label.selector(labels,label.tracker)
+  results[paste("I", r, ".Label", sep = "")] <- iterlabel
+  train$iterl <- iterlabel[index$train]
+  test$iterl <- iterlabel[index$test]
+  valid$iterl <- iterlabel[index$valid]
+  
+  #Make dataframes work for decision trees
+  train$data <- data.frame(cbind(train$iterl, train$img))
+  colnames(train$data)[1] <- "label"
+  test$data <- data.frame(cbind(test$iterl, test$img))
+  colnames(test$data)[1] <- "label"
+  valid$data <- data.frame(cbind(valid$iterl, valid$img))
+  colnames(valid$data)[1] <- "label"
+  
+  #THIS IS WHERE CLASSIFICATION ACTUALLY HAPPENS
+  model <- rpart(formula, method = "class", data = train$data)
+  #save this?
+  results[paste("I", r, ".Pred", sep = "")] <- 
+    as.integer(predict(model, img_fs, type="class"))
+  
+  #sum labels at used indices
+  labelsum[[r]] = sum(label.tracker[c(index$train, index$test, index$valid)])
+  
+  ## Update the label tracker
+  if(r!=4)
+  {
+    results[paste("I", r, ".Label.Added", sep = "")] <- FALSE
+    miss.train <- which(results[index$train,paste("I", r, ".Pred", sep = "")]!=
+                          results[index$train,paste("I", r, ".Label", sep = "")])
+    #Different calculations of "Actual Label"
+    miss.rest <- which(results[c(index$test, index$valid) ,paste("I", r, ".Pred", sep = "")]!=
+                          results[c(index$test, index$valid) , "Max.Mode"])
+    label.tracker[miss.index] <- label.tracker[miss.index]+1
+    results[miss.index, paste("I", r, ".Label.Added", sep = "")] <- TRUE
+  }
+}

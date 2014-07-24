@@ -2,6 +2,10 @@ library(caret)
 
 library(mlbench)
 
+#This is super fucked
+mymodel <- train.j48$modelInfo
+mymodel$parameters <- data.frame(parameter = c("U", "C", "M", "B", "S"), class = c("logical","numeric", "numeric", "logical", "logical"), label = c("U", "C", "M", "B", "S"))
+
 form = as.formula("iterlabel[index] ~ markov1 + markov2 + markov3 + markov4 + markov5 +     
                      SDIntensityBG + IntensityDifference + avg.gabor.mean + avg.gabor.SD + Energy + Homogeneity + Entropy + 
                      thirdordermoment + Inversevariance + Sumaverage + Variance + Clustertendency + MaxProbability +
@@ -36,12 +40,30 @@ for(r in 1:4)
   training <- cbind(iterlabel[index], img_fs[index,])
   
   tc <- trainControl(method = "cv",verboseIter = TRUE, returnData = TRUE)
-  grid <- expand.grid(C=seq(0.05, 0.25, 0.05))
+  grid <- expand.grid(C=0.15, M=4, B= FALSE, U= FALSE, S = FALSE)
+
+  
+  train.j481 <- train(x = training[,-1], 
+                     y= training[,1], 
+                     method=mymodel, 
+                     tuneGrid = grid,
+                     trControl = tc)
   
   train.j48 <- train(x = training[,-1], 
-                     y= training[,1], 
-                     method="J48", 
-                     tuneGrid = grid)
-
+                      y= training[,1], 
+                      method="J48", 
+                      #tuneGrid = grid,
+                      trControl = tc,)
+  train.rpart <- train(x = training[,-1], 
+                      y= training[,1], 
+                      method="rpart")
+  train.rpart1 <- train(x = training[,-1], 
+                       y= training[,1], 
+                       method="rpart",
+                       trControl = tc)
+  
+  model <- J48(form, training[,-1], 
+               training[,1])
+  
 }
   

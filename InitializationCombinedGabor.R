@@ -28,7 +28,7 @@ mode <- function(x)
 
 rescale <- function(x)
 {
-  value <- ifelse(x==1|x==2,'benign', ifelse( x==3, 'intermediate', 'malignant'))
+  value <- ifelse(x==1|x==2,1, ifelse( x==3, 2, 3))
   return(value)
 }
 
@@ -80,15 +80,15 @@ bal_strat <- function(labels){
   
   ##Stratify 60% training, 30% testing, 10% validation
   train.ones <- sample(201, 121, replace=FALSE)
-  train.twos <- sample(341, 195, replace=FALSE)
+  train.twos <- sample(341, 205, replace=FALSE)
   train.threes <- sample(268, 161, replace=FALSE)
   train.index <- c(ones[train.ones], twos[train.twos], threes[train.threes])
   test.ones <- sample(seq(1:201)[-train.ones], 60, replace=FALSE)
-  test.twos <- sample(seq(1:341)[-train.twos], 97, replace=FALSE)
+  test.twos <- sample(seq(1:341)[-train.twos], 102, replace=FALSE)
   test.threes <- sample(seq(1:268)[-train.threes], 80, replace=FALSE)
   test.index <- c(ones[test.ones], twos[test.twos], threes[test.threes])
   valid.ones <- sample(seq(1:201)[-c(train.ones, test.ones)], 20,replace=FALSE)
-  valid.twos <- sample(seq(1:341)[-c(train.twos, test.twos)], 32, replace=FALSE)
+  valid.twos <- sample(seq(1:341)[-c(train.twos, test.twos)], 34, replace=FALSE)
   valid.threes <- sample(seq(1:268)[-c(train.threes, test.threes)], 27, replace=FALSE)
   valid.index <- c(ones[valid.ones], twos[valid.twos], threes[valid.threes])
   index = NULL
