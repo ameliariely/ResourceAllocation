@@ -47,7 +47,8 @@ results[index$valid, "Set"] <- "valid"
 ics = rbind(rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01),
             rpart.control(minsplit = 150, minbucket= round(150/2), cp = 0.01),
             rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01))
+            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
+            rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01))
 
 ##Iterations
 for(r in 1:4)
