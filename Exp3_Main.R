@@ -9,7 +9,7 @@ img_fs <- data.frame(img_fs, Avg.Gabor(data))
 col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set", 
           "I1 Label", "I1 Pred", "I1 Label Added", "I2 Label", 
           "I2 Pred","I2 Label Added", "I3 Label", "I3 Pred",
-          "I3 Label Added", "I4 Label", "I4 Pred")
+          "I3 Label Added", "I4 Label", "I4 Pred", "Max.Pred")
 results <- data.frame(data.frame(matrix(vector(), 810, 16, dimnames=list(c(), col))))
 
 ##Process labels
@@ -39,6 +39,15 @@ models = vector(mode="list",length=70)
 train$img <- as.matrix(img_fs[index$train,])
 test$img <- as.matrix(img_fs[index$test,])
 valid$img <- as.matrix(img_fs[index$valid,])
+results[index$train, "Set"] <- "train"
+results[index$test, "Set"] <- "test"
+results[index$valid, "Set"] <- "valid"
+
+#Controls
+ics = rbind(rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01),
+            rpart.control(minsplit = 150, minbucket= round(150/2), cp = 0.01),
+            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
+            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01))
 
 ##Iterations
 for(r in 1:4)
@@ -60,7 +69,7 @@ for(r in 1:4)
   colnames(valid$data)[1] <- "label"
   
   #THIS IS WHERE CLASSIFICATION ACTUALLY HAPPENS
-  model <- rpart(formula, method = "class", data = train$data)
+  model <- rpart(formula, method = "class", data = train$data, control = ics[r])
   #save this?
   results[paste("I", r, ".Pred", sep = "")] <- 
     as.integer(predict(model, img_fs, type="class"))
@@ -81,3 +90,47 @@ for(r in 1:4)
     results[c(miss.train, miss.rest), paste("I", r, ".Label.Added", sep = "")] <- TRUE
   }
 }
+
+#Comparison Consensus Classification
+
+r=5
+model <- rpart(formula, method = "class", data = train$data, control = ics[r])
+#save this?
+results["Max.Pred"] <- 
+  as.integer(predict(model, img_fs, type="class"))
+
+trainCon = cbind(
+train1 = confusionMatrix(results[index$train, "I1.Label"], 
+                         results[index$train, "I1.Pred"]),
+train2 = confusionMatrix(results[index$train, "I2.Label"], 
+                         results[index$train, "I2.Pred"]),
+train3 = confusionMatrix(results[index$train, "I3.Label"], 
+                         results[index$train, "I3.Pred"]),
+train4 = confusionMatrix(results[index$train, "I4.Label"], 
+                         results[index$train, "I4.Pred"])
+train5 = confusionMatrix(results[index$train, "Max.Mode"], 
+                         results[index$train, "Max.Pred"]))
+
+testCon = cbind(
+test1 = confusionMatrix(results[index$test, "I1.Label"], 
+                         results[index$test, "I1.Pred"]),
+test2 = confusionMatrix(results[index$test, "I2.Label"], 
+                         results[index$test, "I2.Pred"]),
+test3 = confusionMatrix(results[index$test, "I3.Label"], 
+                         results[index$test, "I3.Pred"]),
+test4 = confusionMatrix(results[index$test, "I4.Label"], 
+                         results[index$test, "I4.Pred"])
+test5 = confusionMatrix(results[index$test, "Max.Mode"], 
+                         results[index$test, "Max.Pred"]))
+
+validCon = cbind(
+valid1 = confusionMatrix(results[index$valid, "I1.Label"], 
+                         results[index$valid, "I1.Pred"]),
+valid2 = confusionMatrix(results[index$valid, "I2.Label"], 
+                         results[index$valid, "I2.Pred"]),
+valid3 = confusionMatrix(results[index$valid, "I3.Label"], 
+                         results[index$valid, "I3.Pred"]),
+valid4 = confusionMatrix(results[index$valid, "I4.Label"], 
+                         results[index$valid, "I4.Pred"])
+valid5 = confusionMatrix(results[index$valid, "Max.Mode"], 
+                         results[index$valid, "Max.Pred"]))

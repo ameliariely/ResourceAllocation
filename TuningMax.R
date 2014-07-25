@@ -1,34 +1,31 @@
 #Basic stuff
 {##Absolutely necessary to run initialization BEFORE this file
-
-##Import data
-data <- read.csv("LIDC dataset with full annotations.csv",header=TRUE)
-img_fs <- data[,c(5:18, 43:69)]
-img_fs <- data.frame(img_fs, Avg.Gabor(data))
-
-#Df for results
-col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set",
-          "I1 Label", "I1 Pred", "I1 Label Added", "I2 Label", 
-          "I2 Pred","I2 Label Added", "I3 Label", "I3 Pred",
-          "I3 Label Added", "I4 Label", "I4 Pred")
-results <- data.frame(data.frame(matrix(vector(), 810, 16, dimnames=list(c(), col))))
-
-## Label tracker
-label.tracker <- rep(1,nrow(data))
-labelsum <- list()
-
-#Null objects
-train = NULL
-test = NULL
-valid = NULL
-
-tables <- vector(mode="list",length=20)}
+  
+  ##Import data
+  data <- read.csv("LIDC dataset with full annotations.csv",header=TRUE)
+  img_fs <- data[,c(5:18, 43:69)]
+  img_fs <- data.frame(img_fs, Avg.Gabor(data))
+  
+  #Df for results
+  col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set",
+            "I1 Label", "I1 Pred", "I1 Label Added", "I2 Label", 
+            "I2 Pred","I2 Label Added", "I3 Label", "I3 Pred",
+            "I3 Label Added", "I4 Label", "I4 Pred")
+  results <- data.frame(data.frame(matrix(vector(), 810, 16, dimnames=list(c(), col))))
+  
+  ## Label tracker
+  label.tracker <- rep(1,nrow(data))
+  labelsum <- list()
+  
+  #Null objects
+  train = NULL
+  test = NULL
+  valid = NULL
+  
+  tables <- vector(mode="list",length=20)}
 
 #Tuned controls per iteration
-ics = rbind(rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01),
-            rpart.control(minsplit = 150, minbucket= round(150/2), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01))
+ics = rbind(rpart.control(minsplit = 300, minbucket= round(300/6), cp = 0.01))
 
 for (t in 1:20){
   
@@ -52,9 +49,9 @@ for (t in 1:20){
   test$img <- as.matrix(img_fs[index$test,])
   valid$img <- as.matrix(img_fs[index$valid,])
   
-  table <- data.frame(data.frame(matrix(vector(), 50, 7, 
-                                        dimnames=list(c(), c("np","nc","tr","teI", 
-                                                             "diff", "trM","teM")))))
+  table <- data.frame(data.frame(matrix(vector(), 50, 5, 
+                                        dimnames=list(c(), c("np","nc","trM",
+                                                              "teM", "diff")))))
   #Controls
 {ms = 20
  table [1:3,1] = ms
@@ -140,93 +137,39 @@ for (t in 1:20){
 
 #Get label
 {
-
-##Iterations
-#change end of loop depending on iteration being tuned
-for(r in 1:3)
-{
-  #Different iterative label vector for each iteration
-  iterlabel <- label.selector(labels,label.tracker)
-  results[paste("I", r, ".Label", sep = "")] <- iterlabel
-  train$iterl <- iterlabel[index$train]
-  test$iterl <- iterlabel[index$test]
-  valid$iterl <- iterlabel[index$valid]
+  
+  #Trials for parameter tuning
+  r = 1
+  
   
   #Make dataframes work for decision trees
-  train$data <- data.frame(cbind(train$iterl, train$img))
+  train$data <- data.frame(cbind(results[index$train, "Max.Mode"], train$img))
   colnames(train$data)[1] <- "label"
-  test$data <- data.frame(cbind(test$iterl, test$img))
+  test$data <- data.frame(cbind(results[index$test, "Max.Mode"], test$img))
   colnames(test$data)[1] <- "label"
-  valid$data <- data.frame(cbind(valid$iterl, valid$img))
-  colnames(valid$data)[1] <- "label"
-  
-  #THIS IS WHERE CLASSIFICATION ACTUALLY HAPPENS
-  model <- rpart(formula, method = "class", data = train$data, control = ics[r])
-  #save this?
-  results[paste("I", r, ".Pred", sep = "")] <- 
-    as.integer(predict(model, img_fs, type="class"))
-  
-  #sum labels at used indices
-  labelsum[[r]] = sum(label.tracker[c(index$train, index$test, index$valid)])
-  
-  ## Update the label tracker
-  if(r!=4)
-  {
-    results[paste("I", r, ".Label.Added", sep = "")] <- FALSE
-    miss.train <- which(results[index$train,paste("I", r, ".Pred", sep = "")]!=
-                          results[index$train,paste("I", r, ".Label", sep = "")])
-    #Different calculations of "Actual Label"
-    miss.rest <- which(results[c(index$test, index$valid) ,paste("I", r, ".Pred", sep = "")]!=
-                         results[c(index$test, index$valid) , "Max.Mode"])
-    label.tracker[c(miss.train, miss.rest)] <- label.tracker[c(miss.train, miss.rest)]+1
-    results[c(miss.train, miss.rest), paste("I", r, ".Label.Added", sep = "")] <- TRUE
-  }
-}
-
-#Trials for parameter tuning
-r = 4
-
-#Different iterative label vector for each iteration
-iterlabel <- label.selector(labels,label.tracker)
-results[paste("I", r, ".Label", sep = "")] <- iterlabel
-train$iterl <- iterlabel[index$train]
-test$iterl <- iterlabel[index$test]
-valid$iterl <- iterlabel[index$valid]
-
-#Make dataframes work for decision trees
-train$data <- data.frame(cbind(train$iterl, train$img))
-colnames(train$data)[1] <- "label"
-test$data <- data.frame(cbind(test$iterl, test$img))
-colnames(test$data)[1] <- "label"
-valid$data <- data.frame(cbind(valid$iterl, valid$img))
-colnames(valid$data)[1] <- "label"}
+  valid$data <- data.frame(cbind(results[index$valid, "Max.Mode"], valid$img))
+  colnames(valid$data)[1] <- "label"}
 
 for (i in 1:50){
-
+  
   #THIS IS WHERE CLASSIFICATION ACTUALLY HAPPENS
   model <- rpart(formula, method = "class", data = train$data, control = controls[i,])
-  results[paste("I", r, ".Pred", sep = "")] <- as.integer(predict(model, img_fs, type="class"))
-  
-  miss.train <- which(results[index$train,paste("I", r, ".Pred", sep = "")]!=
-                        results[index$train,paste("I", r, ".Label", sep = "")])
-  miss.trM <- which(results[index$train,paste("I", r, ".Pred", sep = "")]!=
+  results["Max.Pred"] <- as.integer(predict(model, img_fs, type="class"))
+
+  miss.trM <- which(results[index$train,"Max.Pred"]!=
                       results[index$train , "Max.Mode"])
-  miss.teM <- which(results[index$test ,paste("I", r, ".Pred", sep = "")]!=
-                       results[index$test , "Max.Mode"])
-  miss.teI <- which(results[index$test ,paste("I", r, ".Pred", sep = "")]!=
-                      results[index$test,paste("I", r, ".Label", sep = "")])
+  miss.teM <- which(results[index$test ,"Max.Pred"]!=
+                      results[index$test , "Max.Mode"])
   
   avg <- data.frame(data.frame(matrix(vector(), 50, 5, 
-                                        dimnames=list(c(), c("tr","trM",
-                                                             "teI", "teM", "diff")))))
+                                      dimnames=list(c(), c("tr","trM",
+                                                           "teI", "teM", "diff")))))
   
-  table[i, "tr"] = 1-length(miss.train)/length(index$train)
   table[i, "trM"] = 1-length(miss.trM)/length(index$train)
-  table[i, "teI"] = 1-length(miss.teI)/length(index$test)
   table[i, "teM"] = 1-length(miss.teM)/length(index$test)
   
 }
-table["diff"] = table["tr"]-table["teI"]
+table["diff"] = table["trM"]-table["teM"]
 tables[[t]] <- table
 }
 tables2 = llply(tables, function(df) df[,sapply(df, is.numeric)]) # strip out non-numeric cols
