@@ -10,7 +10,7 @@ col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set",
           "I1 Label", "I1 Pred", "I1 Label Added", "I2 Label", 
           "I2 Pred","I2 Label Added", "I3 Label", "I3 Pred",
           "I3 Label Added", "I4 Label", "I4 Pred", "Max.Pred")
-results <- data.frame(data.frame(matrix(vector(), 810, 16, dimnames=list(c(), col))))
+results <- data.frame(data.frame(matrix(vector(), 810, 17, dimnames=list(c(), col))))
 
 ##Process labels
 #currently iterative labeling for both trail and test
@@ -108,7 +108,7 @@ train2 = confusionMatrix(results[index$train, "I2.Label"],
 train3 = confusionMatrix(results[index$train, "I3.Label"], 
                          results[index$train, "I3.Pred"]),
 train4 = confusionMatrix(results[index$train, "I4.Label"], 
-                         results[index$train, "I4.Pred"])
+                         results[index$train, "I4.Pred"]),
 train5 = confusionMatrix(results[index$train, "Max.Mode"], 
                          results[index$train, "Max.Pred"]))
 
@@ -120,7 +120,7 @@ test2 = confusionMatrix(results[index$test, "I2.Label"],
 test3 = confusionMatrix(results[index$test, "I3.Label"], 
                          results[index$test, "I3.Pred"]),
 test4 = confusionMatrix(results[index$test, "I4.Label"], 
-                         results[index$test, "I4.Pred"])
+                         results[index$test, "I4.Pred"]),
 test5 = confusionMatrix(results[index$test, "Max.Mode"], 
                          results[index$test, "Max.Pred"]))
 
@@ -132,6 +132,59 @@ valid2 = confusionMatrix(results[index$valid, "I2.Label"],
 valid3 = confusionMatrix(results[index$valid, "I3.Label"], 
                          results[index$valid, "I3.Pred"]),
 valid4 = confusionMatrix(results[index$valid, "I4.Label"], 
-                         results[index$valid, "I4.Pred"])
+                         results[index$valid, "I4.Pred"]),
 valid5 = confusionMatrix(results[index$valid, "Max.Mode"], 
                          results[index$valid, "Max.Pred"]))
+
+trainConMax = cbind(
+  train1 = confusionMatrix(results[index$train, "I1.Label"], 
+                           results[index$train, "Max.Mode"]),
+  train2 = confusionMatrix(results[index$train, "I2.Label"], 
+                           results[index$train, "Max.Mode"]),
+  train3 = confusionMatrix(results[index$train, "I3.Label"], 
+                           results[index$train, "Max.Mode"]),
+  train4 = confusionMatrix(results[index$train, "I4.Label"], 
+                           results[index$train, "Max.Mode"]),
+  train5 = confusionMatrix(results[index$train, "Max.Mode"], 
+                           results[index$train, "Max.Pred"]))
+
+testConMax = cbind(
+  test1 = confusionMatrix(results[index$test, "I1.Label"], 
+                          results[index$test, "Max.Mode"]),
+  test2 = confusionMatrix(results[index$test, "I2.Label"], 
+                          results[index$test, "Max.Mode"]),
+  test3 = confusionMatrix(results[index$test, "I3.Label"], 
+                          results[index$test, "Max.Mode"]),
+  test4 = confusionMatrix(results[index$test, "I4.Label"], 
+                          results[index$test, "Max.Mode"]),
+  test5 = confusionMatrix(results[index$test, "Max.Mode"], 
+                          results[index$test, "Max.Pred"]))
+
+validConMax = cbind(
+  valid1 = confusionMatrix(results[index$valid, "I1.Label"], 
+                           results[index$valid, "I1.Pred"]),
+  valid2 = confusionMatrix(results[index$valid, "I2.Label"], 
+                           results[index$valid, "Max.Mode"]),
+  valid3 = confusionMatrix(results[index$valid, "I3.Label"], 
+                           results[index$valid, "Max.Mode"]),
+  valid4 = confusionMatrix(results[index$valid, "I4.Label"], 
+                           results[index$valid, "Max.Mode"]),
+  valid5 = confusionMatrix(results[index$valid, "Max.Mode"], 
+                           results[index$valid, "Max.Pred"]))
+
+
+acc.col = c("I1","M1","I2","M2","I3","M3","I4","M4","Max")
+acc = data.frame(data.frame(matrix(vector(), 3, 9, dimnames=list(c(), acc.col))),
+                 row.names= c("Train", "Test","Valid"))
+
+for (j in 1:5){
+  acc["Train",(j*2)-1] = trainCon[,j]$overall["Accuracy"] 
+  acc["Test",(j*2)-1] = testCon[,j]$overall["Accuracy"]
+  acc["Valid",(j*2)-1] = validCon[,j]$overall["Accuracy"]
+  
+  if(j!=5){
+    acc["Train",(j*2)] = trainConMax[,j]$overall["Accuracy"] 
+    acc["Test",(j*2)] = testConMax[,j]$overall["Accuracy"]
+    acc["Valid",(j*2)] = validConMax[,j]$overall["Accuracy"] 
+  }
+}
