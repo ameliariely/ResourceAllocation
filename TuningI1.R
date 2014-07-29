@@ -162,23 +162,18 @@ for (i in 1:50){
   model <- rpart(formula, method = "class", data = train$data, control = controls[i,])
   results[paste("I", r, ".Pred", sep = "")] <- as.integer(predict(model, img_fs, type="class"))
   
-  miss.train <- which(results[index$train,paste("I", r, ".Pred", sep = "")]!=
-                        results[index$train,paste("I", r, ".Label", sep = "")])
-  miss.trM <- which(results[index$train,paste("I", r, ".Pred", sep = "")]!=
-                      results[index$train , "Max.Mode"])
-  miss.teM <- which(results[index$test ,paste("I", r, ".Pred", sep = "")]!=
-                      results[index$test , "Max.Mode"])
-  miss.teI <- which(results[index$test ,paste("I", r, ".Pred", sep = "")]!=
-                      results[index$test,paste("I", r, ".Label", sep = "")])
-  
   avg <- data.frame(data.frame(matrix(vector(), 50, 5, 
                                       dimnames=list(c(), c("tr","trM",
                                                            "teI", "teM", "diff")))))
   
-  table[i, "tr"] = 1-length(miss.train)/length(index$train)
-  table[i, "trM"] = 1-length(miss.trM)/length(index$train)
-  table[i, "teI"] = 1-length(miss.teI)/length(index$test)
-  table[i, "teM"] = 1-length(miss.teM)/length(index$test)
+  table[i, "tr"] = confusionMatrix(results[index$train, "I1.Label"], 
+                                   results[index$train, "I1.Pred"])overall["Accuracy"]
+  table[i, "trM"] = confusionMatrix(results[index$train, "I1.Label"], 
+                                    results[index$train, "Max.Mode"])overall["Accuracy"]
+  table[i, "teI"] = confusionMatrix(results[index$test, "I1.Label"], 
+                                    results[index$test, "I1.Pred"])overall["Accuracy"]
+  table[i, "teM"] = confusionMatrix(results[index$test, "I1.Label"], 
+                                    results[index$test, "Max.Mode"])overall["Accuracy"]
   
 }
 table["diff"] = table["tr"]-table["teI"]
