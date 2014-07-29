@@ -11,13 +11,6 @@ col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set",
           "I2 Pred","I2 Label Num", "I3 Label", "I3 Pred",
           "I3 Label Num", "I4 Label", "I4 Pred", "Max.Pred")
 
-#Controls
-ics = rbind(rpart.control(minsplit = 510, minbucket= 2, cp = 0.01),
-            rpart.control(minsplit = 510, minbucket= 2, cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01))
-
 t = 20
 
 allaccs <- vector(mode="list",length=t)

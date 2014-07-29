@@ -140,7 +140,7 @@ calcacc <- function (results, index, g){
 return (table)
 }
 
-ms = seq(30, 510, 30)
+ms = seq(30, 450, 30)
 mb = seq(2, 60, 4)
 md = seq(5, 15, 5)
 
@@ -150,8 +150,6 @@ tunecontrols = expand.grid("minsplit" = ms, "minbucket" = mb, "cp" = 0.01,
                             "maxdepth" =md)
 
 #Controls
-ics = rbind(rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01),
-            rpart.control(minsplit = 150, minbucket= round(150/2), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01))
+ics = rbind(rep (rpart.control(minsplit = 510, minbucket= 2, cp = 0.01),5))
+
+            

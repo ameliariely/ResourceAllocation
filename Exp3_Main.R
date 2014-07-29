@@ -12,11 +12,12 @@ col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set",
           "I3 Label Num", "I4 Label", "I4 Pred", "Max.Pred")
 
 
+t = 20
+
 allaccs <- vector(mode="list",length=t)
 allresults <- vector(mode="list",length=t)
 allmodels <- vector(mode="list",length=t)
 
-t = 20
 
 for (k in 1:t){
   set.seed(k)
@@ -120,6 +121,8 @@ deviance <- (lapply(test4accs, function(x, y = mean(as.numeric(test4accs))) abs(
 best.trial <- max(which(deviance==min(as.numeric(deviance))))
 
 View(allresults[[best.trial]])
+best = allresults[[best.trial]]
+save(best, file = "best.Rda")
 
 allaccs2 = llply(allaccs, function(df) df[,sapply(df, is.numeric)]) # strip out non-numeric cols
 avgaccs  = Reduce("+", allaccs2)/length(allaccs2)
