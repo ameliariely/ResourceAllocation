@@ -7,9 +7,9 @@ img_fs <- data.frame(img_fs, Avg.Gabor(data))
 
 #Df for results
 col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set", 
-          "I1 Label", "I1 Pred", "I1 Label Added", "I2 Label", 
-          "I2 Pred","I2 Label Added", "I3 Label", "I3 Pred",
-          "I3 Label Added", "I4 Label", "I4 Pred", "Max.Pred")
+          "I1 Label", "I1 Pred", "I1 Label Num", "I2 Label", 
+          "I2 Pred","I2 Label Num", "I3 Label", "I3 Pred",
+          "I3 Label Num", "I4 Label", "I4 Pred", "Max.Pred")
 
 
 allaccs <- vector(mode="list",length=t)
@@ -88,11 +88,10 @@ for(r in 1:4)
   ## Update the label tracker
   if(r!=4)
   {
-    results[paste("I", r, ".Label.Added", sep = "")] <- FALSE
     miss.iter <- which(results[,paste("I", r, ".Pred", sep = "")]!=
                          results[,paste("I", r, ".Label", sep = "")])
     label.tracker[miss.iter] <- label.tracker[miss.iter]+1
-    results[miss.iter, paste("I", r, ".Label.Added", sep = "")] <- TRUE
+    results[paste("I", r, ".Label.Num", sep = "")] <- label.tracker
   }
   
 }

@@ -7,13 +7,13 @@ img_fs <- data.frame(img_fs, Avg.Gabor(data))
 
 #Df for results
 col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set", 
-          "I1 Label", "I1 Pred", "I1 Label Added", "I2 Label", 
-          "I2 Pred","I2 Label Added", "I3 Label", "I3 Pred",
-          "I3 Label Added", "I4 Label", "I4 Pred", "Max.Pred")
+          "I1 Label", "I1 Pred", "I1 Label Num", "I2 Label", 
+          "I2 Pred","I2 Label Num", "I3 Label", "I3 Pred",
+          "I3 Label Num", "I4 Label", "I4 Pred", "Max.Pred")
 
 #Controls
-ics = rbind(rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01),
-            rpart.control(minsplit = 150, minbucket= round(150/2), cp = 0.01),
+ics = rbind(rpart.control(minsplit = 510, minbucket= 2, cp = 0.01),
+            rpart.control(minsplit = 510, minbucket= 2, cp = 0.01),
             rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
             rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
             rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01))
@@ -64,7 +64,7 @@ for (k in 1:t){
   train.temp.output <- vector(mode="list",length=4)
   test.temp.output <- vector(mode="list",length=4)
   
-  g=1
+  g=3
   ##Iterations
   for(r in 1:4)
   {
@@ -98,7 +98,7 @@ for (k in 1:t){
       table <- data.frame(data.frame(matrix(vector(), 50, 5, 
                                             dimnames=list(c(), c("trI","trM",
                                                                  "teI", "teM", "diff")))))
-      for(i in 1:1000){
+      for(i in 1:765){
       model <- rpart(formula, method = "class", data = train$data, control = tunecontrols[i,])
       results[paste("I", r, ".Pred", sep = "")] <- 
         as.integer(predict(model, img_fs, type="class"))
@@ -121,11 +121,10 @@ for (k in 1:t){
     ## Update the label tracker
     if(r!=4)
     {
-      results[paste("I", r, ".Label.Added", sep = "")] <- FALSE
       miss.iter <- which(results[,paste("I", r, ".Pred", sep = "")]!=
                            results[,paste("I", r, ".Label", sep = "")])
       label.tracker[miss.iter] <- label.tracker[miss.iter]+1
-      results[miss.iter, paste("I", r, ".Label.Added", sep = "")] <- TRUE
+      results[paste("I", r, ".Label.Num", sep = "")] <- label.tracker
     }
     
   }
@@ -141,7 +140,7 @@ for (k in 1:t){
     r=5
     table <- data.frame(data.frame(matrix(vector(), 50, 3, 
                                           dimnames=list(c(), c("trM","teM", "diff")))))
-    for(i in 1:1000){
+    for(i in 1:765){
       model <- rpart(formula, method = "class", data = train$data, control = tunecontrols[i,])
       results["Max.Pred"] <- 
         as.integer(predict(model, img_fs, type="class"))
@@ -171,4 +170,6 @@ allaccs2 = llply(allaccs, function(df) df[,sapply(df, is.numeric)]) # strip out 
 avgaccs  = Reduce("+", allaccs2)/length(allaccs2)
 View(avgaccs)
 
-
+tables2 = llply(tables, function(df) df[,sapply(df, is.numeric)]) # strip out non-numeric cols
+avg  = Reduce("+", tables2)/length(tables2)
+View(avg)

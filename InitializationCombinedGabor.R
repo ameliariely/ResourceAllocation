@@ -142,7 +142,7 @@ return (table)
 
 ms = seq(30, 510, 30)
 mb = seq(2, 60, 4)
-md = seq(5, 40, 5)
+md = seq(5, 15, 5)
 
 tunecontrols = expand.grid("minsplit" = ms, "minbucket" = mb, "cp" = 0.01, 
                             "maxcompete" = 4,  "maxsurrogate"	= 5,
