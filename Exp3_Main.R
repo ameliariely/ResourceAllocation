@@ -10,6 +10,23 @@ col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set",
           "I1 Label", "I1 Pred", "I1 Label Added", "I2 Label", 
           "I2 Pred","I2 Label Added", "I3 Label", "I3 Pred",
           "I3 Label Added", "I4 Label", "I4 Pred", "Max.Pred")
+
+#Controls
+ics = rbind(rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01),
+            rpart.control(minsplit = 150, minbucket= round(150/2), cp = 0.01),
+            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
+            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
+            rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01))
+
+allaccs <- vector(mode="list",length=t)
+allresults <- vector(mode="list",length=t)
+allmodels <- vector(mode="list",length=t)
+
+t = 20
+
+for (k in 1:t){
+  set.seed(k)
+
 results <- data.frame(data.frame(matrix(vector(), 810, 17, dimnames=list(c(), col))))
 
 ##Process labels
@@ -43,12 +60,9 @@ results[index$train, "Set"] <- "train"
 results[index$test, "Set"] <- "test"
 results[index$valid, "Set"] <- "valid"
 
-#Controls
-ics = rbind(rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01),
-            rpart.control(minsplit = 150, minbucket= round(150/2), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01))
+## Temporary output
+train.temp.output <- vector(mode="list",length=4)
+test.temp.output <- vector(mode="list",length=4)
 
 ##Iterations
 for(r in 1:4)
@@ -71,7 +85,7 @@ for(r in 1:4)
   
   #THIS IS WHERE CLASSIFICATION ACTUALLY HAPPENS
   model <- rpart(formula, method = "class", data = train$data, control = ics[r])
-  #save this?
+  allmodels[[k]] <- model
   results[paste("I", r, ".Pred", sep = "")] <- 
     as.integer(predict(model, img_fs, type="class"))
   
@@ -90,6 +104,7 @@ for(r in 1:4)
     label.tracker[c(miss.train, miss.rest)] <- label.tracker[c(miss.train, miss.rest)]+1
     results[c(miss.train, miss.rest), paste("I", r, ".Label.Added", sep = "")] <- TRUE
   }
+  
 }
 
 #Comparison Consensus Classification
@@ -100,7 +115,9 @@ model <- rpart(formula, method = "class", data = train$data, control = ics[r])
 results["Max.Pred"] <- 
   as.integer(predict(model, img_fs, type="class"))
 
-trainCon = cbind(
+
+#Accuracies
+{trainCon = cbind(
 train1 = confusionMatrix(results[index$train, "I1.Label"], 
                          results[index$train, "I1.Pred"]),
 train2 = confusionMatrix(results[index$train, "I2.Label"], 
@@ -175,7 +192,7 @@ validConMax = cbind(
 
 acc.col = c("I1","M1","I2","M2","I3","M3","I4","M4","Max")
 acc = data.frame(data.frame(matrix(vector(), 3, 9, dimnames=list(c(), acc.col))),
-                 row.names= c("Train", "Test","Valid"))
+                 row.names= c("Train", "Test","Valid"))}
 
 for (j in 1:5){
   acc["Train",(j*2)-1] = trainCon[,j]$overall["Accuracy"] 
@@ -185,6 +202,21 @@ for (j in 1:5){
   if(j!=5){
     acc["Train",(j*2)] = trainConMax[,j]$overall["Accuracy"] 
     acc["Test",(j*2)] = testConMax[,j]$overall["Accuracy"]
-    acc["Valid",(j*2)] = validConMax[,j]$overall["Accuracy"] 
+    acc["Valid",(j*2)] = validConMax[,j]$overall["Accuracy"]
   }
 }
+allaccs[[k]] = acc
+allresults[[k]] = results
+}
+
+test4accs <- (lapply(allaccs, function(x) x["Test", "I4"]))
+deviance <- (lapply(test4accs, function(x, y = mean(as.numeric(test4accs))) abs(x-y)))
+best.trial <- max(which(deviance==min(as.numeric(deviance))))
+
+View(allresults[[best.trial]])
+
+allaccs2 = llply(allaccs, function(df) df[,sapply(df, is.numeric)]) # strip out non-numeric cols
+avgaccs  = Reduce("+", allaccs2)/length(allaccs2)
+View(avgaccs)
+
+
