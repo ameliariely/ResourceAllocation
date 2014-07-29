@@ -177,22 +177,24 @@ for (k in 1:t){
       as.integer(predict(model, img_fs, type="class"))
     }else{
       table <- data.frame(data.frame(matrix(vector(), 50, 5, 
-                                            dimnames=list(c(), c("tr","trM",
+                                            dimnames=list(c(), c("trI","trM",
                                                                  "teI", "teM", "diff")))))
       for (i in 1:50){
       model <- rpart(formula, method = "class", data = train$data, control = controls[i])
       results[paste("I", r, ".Pred", sep = "")] <- 
         as.integer(predict(model, img_fs, type="class"))
-      table[i,"tr"] <- confusionMatrix(results[index$train, paste("I", r, ".Pred", sep = "")],
-                      results[index$train, paste("I", r, ".Label", sep = "")])$overall["Accuracy"]
-      table[i,"trM"] <- confusionMatrix(results[index$train, paste("I", r, ".Pred", sep = "")],
-                                       results[index$train,"Max.Mode"])$overall["Accuracy"]
-      table[i,"teI"] <- confusionMatrix(results[index$test, paste("I", r, ".Pred", sep = "")],
-                                        results[index$test,"Max.Mode"])$overall["Accuracy"]
-      table[i,"teI"] <- confusionMatrix(results[index$test, paste("I", r, ".Pred", sep = "")],
-                                        results[index$test,paste("I", r, ".Label", sep = "")])$overall["Accuracy"]
+      
+      miss.iter <- which(results[,paste("I", r, ".Pred", sep = "")]!=
+                            results[,paste("I", r, ".Label", sep = "")])
+      miss.mode <- which(results[,paste("I", r, ".Pred", sep = "")]!=
+                            results[,"Max.Mode"])
+      
+      table[i,"trI"] <- length(which(results[miss.iter, "Set"] == "train"))/length(index$train)
+      table[i,"trM"] <- length(which(results[miss.mode, "Set"] == "train"))/length(index$train)
+      table[i,"teI"] <- length(which(results[miss.iter, "Set"] == "test"))/length(index$test)
+      table[i,"teM"] <- length(which(results[miss.mode, "Set"] == "test"))/length(index$test)
     }
-    table["diff"] = table["tr"]-table["teI"]
+    table["diff"] = table["trI"]-table["teI"]
     tables[[t]] <- table
     }
     
@@ -203,13 +205,10 @@ for (k in 1:t){
     if(r!=4)
     {
       results[paste("I", r, ".Label.Added", sep = "")] <- FALSE
-      miss.train <- which(results[index$train,paste("I", r, ".Pred", sep = "")]!=
-                            results[index$train,paste("I", r, ".Label", sep = "")])
-      #Different calculations of "Actual Label"
-      miss.rest <- which(results[c(index$test, index$valid) ,paste("I", r, ".Pred", sep = "")]!=
-                           results[c(index$test, index$valid) , "Max.Mode"])
-      label.tracker[c(miss.train, miss.rest)] <- label.tracker[c(miss.train, miss.rest)]+1
-      results[c(miss.train, miss.rest), paste("I", r, ".Label.Added", sep = "")] <- TRUE
+      miss.iter <- which(results[,paste("I", r, ".Pred", sep = "")]!=
+                            results[,paste("I", r, ".Label", sep = "")])
+      label.tracker[miss.iter] <- label.tracker[miss.iter]+1
+      results[miss.iter, paste("I", r, ".Label.Added", sep = "")] <- TRUE
     }
     
   }

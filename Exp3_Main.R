@@ -11,12 +11,6 @@ col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set",
           "I2 Pred","I2 Label Added", "I3 Label", "I3 Pred",
           "I3 Label Added", "I4 Label", "I4 Pred", "Max.Pred")
 
-#Controls
-ics = rbind(rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01),
-            rpart.control(minsplit = 150, minbucket= round(150/2), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/6), cp = 0.01),
-            rpart.control(minsplit = 250, minbucket= round(250/4), cp = 0.01))
 
 allaccs <- vector(mode="list",length=t)
 allresults <- vector(mode="list",length=t)
@@ -51,8 +45,7 @@ index <- bal_strat(labels)
 train = NULL
 test = NULL
 valid = NULL
-models = vector(mode="list",length=70)
-#5 * 14
+models = vector(mode="list",length=4)
 train$img <- as.matrix(img_fs[index$train,])
 test$img <- as.matrix(img_fs[index$test,])
 valid$img <- as.matrix(img_fs[index$valid,])
@@ -85,7 +78,7 @@ for(r in 1:4)
   
   #THIS IS WHERE CLASSIFICATION ACTUALLY HAPPENS
   model <- rpart(formula, method = "class", data = train$data, control = ics[r])
-  allmodels[[k]] <- model
+  models[[r]] <- model
   results[paste("I", r, ".Pred", sep = "")] <- 
     as.integer(predict(model, img_fs, type="class"))
   
@@ -96,27 +89,30 @@ for(r in 1:4)
   if(r!=4)
   {
     results[paste("I", r, ".Label.Added", sep = "")] <- FALSE
-    miss.train <- which(results[index$train,paste("I", r, ".Pred", sep = "")]!=
-                          results[index$train,paste("I", r, ".Label", sep = "")])
-    #Different calculations of "Actual Label"
-    miss.rest <- which(results[c(index$test, index$valid) ,paste("I", r, ".Pred", sep = "")]!=
-                          results[c(index$test, index$valid) , "Max.Mode"])
-    label.tracker[c(miss.train, miss.rest)] <- label.tracker[c(miss.train, miss.rest)]+1
-    results[c(miss.train, miss.rest), paste("I", r, ".Label.Added", sep = "")] <- TRUE
+    miss.iter <- which(results[,paste("I", r, ".Pred", sep = "")]!=
+                         results[,paste("I", r, ".Label", sep = "")])
+    label.tracker[miss.iter] <- label.tracker[miss.iter]+1
+    results[miss.iter, paste("I", r, ".Label.Added", sep = "")] <- TRUE
   }
   
 }
 
 #Comparison Consensus Classification
 
+#Different iterative label vector for each iteration
+conslabel <- label.selector(labels,rep(4, times = length(labels[,4])))
+train$data <- data.frame(cbind(conslabel[index$train], train$img))
+colnames(train$data)[1] <- "label"
+
 r=5
 model <- rpart(formula, method = "class", data = train$data, control = ics[r])
 #save this?
 results["Max.Pred"] <- 
   as.integer(predict(model, img_fs, type="class"))
+models[[r]] = model
 
-
-allaccs[[k]] = acc
+allaccs[[k]] = calcacc(results, index, g=5)
+allmodels[[k]] = models
 allresults[[k]] = results
 }
 
