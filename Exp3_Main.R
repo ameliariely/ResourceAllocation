@@ -54,10 +54,6 @@ results[index$train, "Set"] <- "train"
 results[index$test, "Set"] <- "test"
 results[index$valid, "Set"] <- "valid"
 
-## Temporary output
-train.temp.output <- vector(mode="list",length=4)
-test.temp.output <- vector(mode="list",length=4)
-
 ##Iterations
 for(r in 1:4)
 {
