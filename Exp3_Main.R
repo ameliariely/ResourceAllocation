@@ -9,7 +9,8 @@ img_fs <- data.frame(img_fs, Avg.Gabor(data))
 col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set", 
           "I1 Label", "I1 Pred", "I1 Label Num", "I2 Label", 
           "I2 Pred","I2 Label Num", "I3 Label", "I3 Pred",
-          "I3 Label Num", "I4 Label", "I4 Pred", "Max.Pred")
+          "I3 Label Num", "I4 Label", "I4 Pred", "A1.Pred",
+          "A2.Pred","A3.Pred","A4.Pred")
 
 
 t = 20
@@ -22,7 +23,7 @@ allmodels <- vector(mode="list",length=t)
 for (k in 1:t){
   set.seed(k)
 
-results <- data.frame(data.frame(matrix(vector(), 810, 17, dimnames=list(c(), col))))
+results <- data.frame(data.frame(matrix(vector(), 810, 20, dimnames=list(c(), col))))
 
 ##Process labels
 #currently iterative labeling for both trail and test
@@ -74,7 +75,7 @@ for(r in 1:4)
   colnames(valid$data)[1] <- "label"
   
   #THIS IS WHERE CLASSIFICATION ACTUALLY HAPPENS
-  model <- rpart(formula, method = "class", data = train$data, control = ics[r])
+  model <- rpart(formula, method = "class", data = train$data, control = tunecontrols[1])
   models[[r]] <- model
   results[paste("I", r, ".Pred", sep = "")] <- 
     as.integer(predict(model, img_fs, type="class"))
@@ -95,19 +96,19 @@ for(r in 1:4)
 
 #Comparison Consensus Classification
 
+for(a in 1:4){
 #Different iterative label vector for each iteration
-conslabel <- label.selector(labels,rep(4, times = length(labels[,4])))
+conslabel <- label.selector(labels,rep(a, times = length(labels[,1])))
 train$data <- data.frame(cbind(conslabel[index$train], train$img))
 colnames(train$data)[1] <- "label"
 
-r=5
 model <- rpart(formula, method = "class", data = train$data, control = ics[r])
-#save this?
-results["Max.Pred"] <- 
+results[paste("A", r, ".Pred")] <- 
   as.integer(predict(model, img_fs, type="class"))
-models[[r]] = model
+models[[a+4]] = model
+}
 
-allaccs[[k]] = calcacc(results, index, g=5)
+allaccs[[k]] = calcacc(results, index, g=8)
 allmodels[[k]] = models
 allresults[[k]] = results
 }

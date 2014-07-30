@@ -57,9 +57,9 @@ for (k in 1:t){
   train.temp.output <- vector(mode="list",length=4)
   test.temp.output <- vector(mode="list",length=4)
   
-  g=3
+  g=1
   ##Iterations
-  for(r in 1:4)
+  for(r in 1:g)
   {
     set.seed(r)
     #Different iterative label vector for each iteration
@@ -91,7 +91,7 @@ for (k in 1:t){
       table <- data.frame(data.frame(matrix(vector(), 50, 5, 
                                             dimnames=list(c(), c("trI","trM",
                                                                  "teI", "teM", "diff")))))
-      for(i in 1:765){
+      for(i in 1:585){
       model <- rpart(formula, method = "class", data = train$data, control = tunecontrols[i,])
       results[paste("I", r, ".Pred", sep = "")] <- 
         as.integer(predict(model, img_fs, type="class"))
@@ -101,13 +101,14 @@ for (k in 1:t){
       miss.mode <- which(results[,paste("I", r, ".Pred", sep = "")]!=
                            results[,"Max.Mode"])
       
-      table[i,"trI"] <- length(which(results[miss.iter, "Set"] == "train"))/length(index$train)
-      table[i,"trM"] <- length(which(results[miss.mode, "Set"] == "train"))/length(index$train)
-      table[i,"teI"] <- length(which(results[miss.iter, "Set"] == "test"))/length(index$test)
-      table[i,"teM"] <- length(which(results[miss.mode, "Set"] == "test"))/length(index$test)
+      table[i,"trI"] <- 1-length(which(results[miss.iter, "Set"] == "train"))/length(index$train)
+      table[i,"trM"] <- 1-length(which(results[miss.mode, "Set"] == "train"))/length(index$train)
+      table[i,"teI"] <- 1-length(which(results[miss.iter, "Set"] == "test"))/length(index$test)
+      table[i,"teM"] <- 1-length(which(results[miss.mode, "Set"] == "test"))/length(index$test)
       }
       table["diff"] = table["trI"]-table["teI"]
       tables[[k]] <- table
+      "one loop"
     }
     
     
