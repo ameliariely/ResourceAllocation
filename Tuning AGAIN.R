@@ -53,10 +53,6 @@ for (k in 1:t){
   results[index$test, "Set"] <- "test"
   results[index$valid, "Set"] <- "valid"
   
-  ## Temporary output
-  train.temp.output <- vector(mode="list",length=4)
-  test.temp.output <- vector(mode="list",length=4)
-  
   g=1
   ##Iterations
   for(r in 1:g)
@@ -72,10 +68,6 @@ for (k in 1:t){
     #Make dataframes work for decision trees
     train$data <- data.frame(cbind(train$iterl, train$img))
     colnames(train$data)[1] <- "label"
-    test$data <- data.frame(cbind(test$iterl, test$img))
-    colnames(test$data)[1] <- "label"
-    valid$data <- data.frame(cbind(valid$iterl, valid$img))
-    colnames(valid$data)[1] <- "label"
     
     #THIS IS WHERE CLASSIFICATION ACTUALLY HAPPENS
     
@@ -88,7 +80,7 @@ for (k in 1:t){
     #sum labels at used indices
     labelsum[[r]] = sum(label.tracker[c(index$train, index$test, index$valid)])
     }else{
-      table <- data.frame(data.frame(matrix(vector(), 50, 5, 
+      table <- data.frame(data.frame(matrix(vector(), 585, 5, 
                                             dimnames=list(c(), c("trI","trM",
                                                                  "teI", "teM", "diff")))))
       for(i in 1:585){
@@ -167,3 +159,8 @@ View(avgaccs)
 tables2 = llply(tables, function(df) df[,sapply(df, is.numeric)]) # strip out non-numeric cols
 avg  = Reduce("+", tables2)/length(tables2)
 View(avg)
+
+yess <- rpart(formula, method = "class", data = train$data, minsplit = 10, minbucket =10, maxdepth=5)
+x = as.integer(predict(yess, img_fs, type="class"))
+rpart.plot(yess)
+length(which(as.integer(x[index$test])==results[index$test,"Max.Mode"]))/length(index$test)

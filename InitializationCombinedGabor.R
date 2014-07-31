@@ -103,39 +103,39 @@ bal_strat <- function(labels){
 #Accuracies
 calcacc <- function (results, index, g){
   d = list(c("Train", "Test", "Valid"),rep(c(paste("I", 1:g,sep = ""), paste("M", 1:g,sep = "")), each =1))
-  table <- data.frame(data.frame(matrix(vector(), 3, 2*g, 
-                                        dimnames=d)))
-  for(r in 1:g){
-  if(r > 5){
-    miss.iter <- which(results[,paste("I", r, ".Pred", sep = "")]!=
-                         results[,paste("I", r, ".Label", sep = "")])
-    miss.mode <- which(results[,paste("I", r, ".Pred", sep = "")]!=
+  table <- data.frame(data.frame(matrix(vector(), 3, 2*g,dimnames=d)))
+  ii=1
+  for(ii in 1:g){
+  if(ii < 5){
+    miss.iter <- which(results[,paste("I", ii, ".Pred", sep = "")]!=
+                         results[,paste("I", ii, ".Label", sep = "")])
+    miss.mode <- which(results[,paste("I", ii, ".Pred", sep = "")]!=
                          results[,"Max.Mode"])
     
-  table["Train", paste("I", r,sep = "")] <- 
+  table["Train", paste("I", ii,sep = "")] <- 
     1-length(which(results[miss.iter, "Set"] == "train"))/length(index$train)
-  table["Test", paste("I", r,sep = "")] <- 
+  table["Test", paste("I", ii,sep = "")] <- 
     1-length(which(results[miss.iter, "Set"] == "test"))/length(index$test)
-  table["Valid", paste("I", r,sep = "")] <- 
+  table["Valid", paste("I", ii,sep = "")] <- 
     1-length(which(results[miss.iter, "Set"] == "valid"))/length(index$valid)
-  table["Train", paste("M", r,sep = "")] <- 
+  table["Train", paste("M", ii,sep = "")] <- 
     1-length(which(results[miss.mode, "Set"] == "train"))/length(index$train)
-  table["Test", paste("M", r,sep = "")] <- 
+  table["Test", paste("M", ii,sep = "")] <- 
     1-length(which(results[miss.mode, "Set"] == "test"))/length(index$test)
-  table["Valid", paste("M", r,sep = "")] <- 
+  table["Valid", paste("M", ii,sep = "")] <- 
     1-length(which(results[miss.mode, "Set"] == "valid"))/length(index$valid)
 } else {
-  miss.mode <- which(results[,paste("I", r, ".Pred", sep = "")]!=
+  miss.mode <- which(results[,paste("A", (ii-4), ".Pred", sep = "")]!=
                        results[,"Max.Mode"])
   
-  table["Train", paste("A", r,sep = "")] <- 
+  table["Train", paste("A", (ii-4),sep = "")] <- 
     1-length(which(results[miss.mode, "Set"] == "train"))/length(index$train)
-  table["Test",paste("A", r,sep = "")] <- 
+  table["Test",paste("A", (ii-4),sep = "")] <- 
     1-length(which(results[miss.mode, "Set"] == "test"))/length(index$test)
-  table["Valid", paste("A", r,sep = "")] <- 
+  table["Valid", paste("A", (ii-4),sep = "")] <- 
     1-length(which(results[miss.mode, "Set"] == "valid"))/length(index$valid)
 }
-
+ii
 }
 return (table)
 }
