@@ -102,8 +102,10 @@ bal_strat <- function(labels){
 
 #Accuracies
 calcacc <- function (results, index, g){
-  d = list(c("Train", "Test", "Valid"),rep(c(paste("I", 1:g,sep = ""), paste("M", 1:g,sep = "")), each =1))
-  table <- data.frame(data.frame(matrix(vector(), 3, 2*g,dimnames=d)))
+  d = list(c("Train", "Test", "Valid"),
+           rep(c(paste("I", 1:4,sep = ""), paste("M", 1:4,sep = ""), 
+               paste("A", 1:4,sep = "")), each =1))
+  table <- data.frame(data.frame(matrix(vector(), 3, 12,dimnames=d)))
   ii=1
   for(ii in 1:g){
   if(ii < 5){
@@ -135,7 +137,6 @@ calcacc <- function (results, index, g){
   table["Valid", paste("A", (ii-4),sep = "")] <- 
     1-length(which(results[miss.mode, "Set"] == "valid"))/length(index$valid)
 }
-ii
 }
 return (table)
 }
