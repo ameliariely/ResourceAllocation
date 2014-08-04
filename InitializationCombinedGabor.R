@@ -164,3 +164,36 @@ ehcontrols = c(rpart.control(minsplit = 510, minbucket= 2, cp = 0.01),
             rpart.control(minsplit = 510, minbucket= 2, cp = 0.01))
 
             
+avgacc <- function(allaccs) {
+  yiah <- data.frame(
+    data.frame(matrix(vector(), 6, 8, 
+                      dimnames=list(c("TrainAcc","TrainErr", "TestAcc","TestErr",
+                                      "ValidAcc", "ValidErr"), c ("I1","I2","I3","I4",
+                                                                  "A1", "A2", "A3", "A4")))))
+  for (i in 1:3){
+    yiah[(i*2)-1,"I1"] = summary(sapply(allaccs, function (x) x[i, "I1"]))["Mean"]
+    yiah[(i*2)-1,"I2"] = summary(sapply(allaccs, function (x) x[i, "I2"]))["Mean"]
+    yiah[(i*2)-1,"I3"] = summary(sapply(allaccs, function (x) x[i, "I3"]))["Mean"]
+    yiah[(i*2)-1,"I4"] = summary(sapply(allaccs, function (x) x[i, "I4"]))["Mean"]
+    yiah[(i*2)-1,"A1"] = summary(sapply(allaccs, function (x) x[i, "A1"]))["Mean"]
+    yiah[(i*2)-1,"A2"] = summary(sapply(allaccs, function (x) x[i, "A2"]))["Mean"]
+    yiah[(i*2)-1,"A3"] = summary(sapply(allaccs, function (x) x[i, "A3"]))["Mean"]
+    yiah[(i*2)-1,"A4"] = summary(sapply(allaccs, function (x) x[i, "A4"]))["Mean"]
+    
+    yiah[i*2,"I1"] = aerror(sapply(allaccs, function (x) x[i, "I1"]))
+    yiah[i*2,"I2"] = aerror(sapply(allaccs, function (x) x[i, "I2"]))
+    yiah[i*2,"I3"] = aerror(sapply(allaccs, function (x) x[i, "I3"]))
+    yiah[i*2,"I4"] = aerror(sapply(allaccs, function (x) x[i, "I4"]))
+    yiah[i*2,"A1"] = aerror(sapply(allaccs, function (x) x[i, "A1"]))
+    yiah[i*2,"A2"] = aerror(sapply(allaccs, function (x) x[i, "A2"]))
+    yiah[i*2,"A3"] = aerror(sapply(allaccs, function (x) x[i, "A3"]))
+    yiah[i*2,"A4"] = aerror(sapply(allaccs, function (x) x[i, "A4"]))
+  }
+  
+  return (yiah)
+  
+}
+
+aerror <- function(x) {
+  qt(0.975,df=length(x)-1)*sd(x)/sqrt(length(x))}
+

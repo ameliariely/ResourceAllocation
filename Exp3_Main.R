@@ -19,7 +19,7 @@ t = 20
 allaccs <- vector(mode="list",length=t)
 allresults <- vector(mode="list",length=t)
 allmodels <- vector(mode="list",length=t)
-
+labelorder <- vector(mode="list",length=t)
 
 for (k in 1:t){
   set.seed(k)
@@ -31,6 +31,9 @@ results <- data.frame(data.frame(matrix(vector(), 810, 20, dimnames=list(c(), co
 labels <- data[,70:73]
 #shuffles labels
 labels <- t(apply(labels,1,sample))
+labelorder[[k]] = apply(labels,c(1,2),rescale)
+#this may not be perfect since the actual labels 
+#are rescaled after the mode is taken
 #takes the mode for each iteration
 labels <- cbind(labels[,1],apply(labels[,1:2],1,mode),
                 apply(labels[,1:3],1,mode),apply(labels,1,mode))
@@ -121,9 +124,10 @@ best.trial <- max(which(deviance==min(as.numeric(deviance))))
 View(allresults[[best.trial]])
 best = allresults[[best.trial]]
 save(best, file = "best.Rda")
+bestorder = labelorder[[best.trial]]
+save(bestorder, file = "bestorder.Rda")
 
-allaccs2 = llply(allaccs, function(df) df[,sapply(df, is.numeric)]) # strip out non-numeric cols
-avgaccs  = Reduce("+", allaccs2)/length(allaccs2)
-View(avgaccs)
+agg  = avgacc(allaccs)
+View(agg)
 
 
