@@ -59,3 +59,18 @@ jv4 = ((abs(bestorder[,1]-jm4)+
 boxplot(jv1, jv2, jv3, jv4, names = c("1", "2", "3", "4"),
         xlab = "Non-selective Iteration", ylab = "Assigned Label Variance", col = "orange",
         varwidth = TRUE)
+
+sv1 = rep(0, 810)
+sm2 = (best["I1.Label"]+ best["I2.Label"])/2
+sm3 = (best["I1.Label"]+ best["I2.Label"]+ best["I3.Label"])/3
+sm4 = (best["I1.Label"]+ best["I2.Label"]+ best["I3.Label"]+best["I4.Label"])/4
+sv2 = ((abs(best["I1.Label"]-sm2)+abs(best["I2.Label"]-sm2))^2)/2
+sv3 = ((abs(best["I1.Label"]-sm3)+abs(best["I2.Label"]-sm3)+abs(best["I3.Label"]-sm3))^2)/3
+sv4 = ((abs(best["I1.Label"]-sm4)+abs(best["I2.Label"]-sm4)+abs(best["I3.Label"]-sm4)
+       +abs(best["I4.Label"]-sm4))^2)/4
+
+boxplot(sv1, sv2,sv3, sv4, jv4, names = c("1", "2", "3", "4", "all"),
+        xlab = "Selective Iteration", ylab = "Assigned Label Variance", col = "orange",
+        varwidth = TRUE)
+
+dv = jv4-sv4

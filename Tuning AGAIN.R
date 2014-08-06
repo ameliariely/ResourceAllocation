@@ -19,6 +19,7 @@ allmodels <- vector(mode="list",length=t)
 tables <- vector(mode="list")
 
 for (k in 1:t){
+  pb <- txtProgressBar(min = 0, max = 20, style = 3)
   set.seed(k)
   
   results <- data.frame(data.frame(matrix(vector(), 810, 17, dimnames=list(c(), col))))
@@ -53,7 +54,7 @@ for (k in 1:t){
   results[index$test, "Set"] <- "test"
   results[index$valid, "Set"] <- "valid"
   
-  g=1
+  g=3
   ##Iterations
   for(r in 1:g)
   {
@@ -142,6 +143,7 @@ for (k in 1:t){
   allaccs[[k]] = calcacc(results, index, g)
   allmodels[[k]] = models
   allresults[[k]] = results
+  setTxtProgressBar(pb, i)
 }
 
 tables2 = llply(tables, function(df) df[,sapply(df, is.numeric)]) # strip out non-numeric cols

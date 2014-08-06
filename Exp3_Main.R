@@ -130,4 +130,7 @@ save(bestorder, file = "bestorder.Rda")
 agg  = avgacc(allaccs)
 View(agg)
 
-
+for (i in 1:4){
+  rpart.plot(allmodels[[best.trial]][[i]])
+}
+duplicated(c(best["I1.Pred"], best["I2.Pred"], best["I3.Pred"], best["I4.Pred"]))
