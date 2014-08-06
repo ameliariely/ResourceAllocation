@@ -79,7 +79,7 @@ for(r in 1:4)
   colnames(valid$data)[1] <- "label"
   
   #THIS IS WHERE CLASSIFICATION ACTUALLY HAPPENS
-  model <- rpart(formula, method = "class", data = train$data, control = cont)
+  model <- rpart(formula, method = "class", data = train$data)
   models[[r]] <- model
   results[paste("I", r, ".Pred", sep = "")] <- 
     as.integer(predict(model, img_fs, type="class"))
@@ -106,7 +106,7 @@ conslabel <- label.selector(labels,rep(a, times = length(labels[,1])))
 train$data <- data.frame(cbind(conslabel[index$train], train$img))
 colnames(train$data)[1] <- "label"
 
-model <- rpart(formula, method = "class", data = train$data, control = cont)
+model <- rpart(formula, method = "class", data = train$data)
 results[paste("A", a, ".Pred", sep = "")] <- 
   as.integer(predict(model, img_fs, type="class"))
 models[[a+4]] = model

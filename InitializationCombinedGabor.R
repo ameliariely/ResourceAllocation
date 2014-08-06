@@ -143,12 +143,11 @@ return (table)
 
 ms = seq(10, 250, 20)
 mb = seq(2, 60, 4)
-md = seq(5, 15, 5)
 
 tunecontrols = expand.grid("minsplit" = ms, "minbucket" = mb, "cp" = 0.01, 
                             "maxcompete" = 4,  "maxsurrogate"	= 5,
                             "usesurrogate" = 2, "surrogatestyle"	=0,
-                            "maxdepth" =md)
+                            "maxdepth" =50)
 
 #Controls
 ics = c(rpart.control(minsplit = 510, minbucket= 2, cp = 0.01),
