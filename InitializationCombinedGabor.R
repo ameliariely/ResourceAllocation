@@ -128,7 +128,7 @@ calcacc <- function (results, index, g){
     1-length(which(results[miss.mode, "Set"] == "valid"))/length(index$valid)
 } else {
   miss.mode <- which(results[,paste("A", (ii-4), ".Pred", sep = "")]!=
-                       results[,"Max.Mode"])
+                       labels[,ii-4])
   
   table["Train", paste("A", (ii-4),sep = "")] <- 
     1-length(which(results[miss.mode, "Set"] == "train"))/length(index$train)
