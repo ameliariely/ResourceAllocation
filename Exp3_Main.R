@@ -15,6 +15,7 @@ col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set",
 cont = rpart.control(minsplit = 250, minbucket= 58, maxdepth = 5)
 
 t = 20
+pb <- txtProgressBar(min = 0, max = t, style = 3)
 
 allaccs <- vector(mode="list",length=t)
 allresults <- vector(mode="list",length=t)
@@ -106,7 +107,7 @@ conslabel <- label.selector(labels,rep(a, times = length(labels[,1])))
 train$data <- data.frame(cbind(conslabel[index$train], train$img))
 colnames(train$data)[1] <- "label"
 
-model <- rpart(formula, method = "class", data = train$data)
+model <- rpart(formula, method = "class", data = train$data, control = ics[a+4])
 results[paste("A", a, ".Pred", sep = "")] <- 
   as.integer(predict(model, img_fs, type="class"))
 models[[a+4]] = model
@@ -115,6 +116,7 @@ models[[a+4]] = model
 allaccs[[k]] = calcacc(results, index, g=8)
 allmodels[[k]] = models
 allresults[[k]] = results
+setTxtProgressBar(pb, k)
 }
 
 test4accs <- (lapply(allaccs, function(x) x["Test", "I4"]))
@@ -130,7 +132,9 @@ save(bestorder, file = "bestorder.Rda")
 agg  = avgacc(allaccs)
 View(agg)
 
-for (i in 1:4){
+for (i in 1:8){
+  pdf(paste("tree", i, ".pdf", sep = ""))
   rpart.plot(allmodels[[best.trial]][[i]])
+  dev.off()
 }
 duplicated(c(best["I1.Pred"], best["I2.Pred"], best["I3.Pred"], best["I4.Pred"]))
