@@ -155,7 +155,10 @@ ics = list(rpart.control(minsplit = 170, minbucket= 6),
             rpart.control(minsplit = 170, minbucket= 6),
            rpart.control(minsplit = 50, minbucket= 6),
            rpart.control(minsplit = 110, minbucket= 6),
-           rpart.control(minsplit = 250, minbucket= 58))
+           rpart.control(minsplit = 250, minbucket= 58),
+           rpart.control(minsplit = 210, minbucket= 6),
+           rpart.control(minsplit = 130, minbucket= 6),
+           rpart.control(minsplit = 150, minbucket= 6))
 
 ehcontrols = c(rpart.control(minsplit = 510, minbucket= 2, cp = 0.01),
             rpart.control(minsplit = 510, minbucket= 2, cp = 0.01),

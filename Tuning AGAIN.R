@@ -12,7 +12,7 @@ col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set",
           "I3 Label Num", "I4 Label", "I4 Pred", "Max.Pred")
 
 t = 20
-g=6
+g=8
 allaccs <- vector(mode="list",length=t)
 allresults <- vector(mode="list",length=t)
 allmodels <- vector(mode="list",length=t)
@@ -157,7 +157,7 @@ for (k in 1:t){
   allaccs[[k]] = calcacc(results, index, g)
   allmodels[[k]] = models
   allresults[[k]] = results
-  setTxtProgressBar(pb, i)
+  setTxtProgressBar(pb, k)
 }
 
 tables2 = llply(tables, function(df) df[,sapply(df, is.numeric)]) # strip out non-numeric cols
