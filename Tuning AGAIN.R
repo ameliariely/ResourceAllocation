@@ -12,14 +12,15 @@ col <-  c("Mode 1", "Mode 2", "Mode 3", "Max Mode", "Set",
           "I3 Label Num", "I4 Label", "I4 Pred", "Max.Pred")
 
 t = 20
-
+g=6
 allaccs <- vector(mode="list",length=t)
 allresults <- vector(mode="list",length=t)
 allmodels <- vector(mode="list",length=t)
 tables <- vector(mode="list")
+pb <- txtProgressBar(min = 0, max = 20, style = 3)
 
 for (k in 1:t){
-  pb <- txtProgressBar(min = 0, max = 20, style = 3)
+
   set.seed(k)
   
   results <- data.frame(data.frame(matrix(vector(), 810, 17, dimnames=list(c(), col))))
@@ -54,7 +55,7 @@ for (k in 1:t){
   results[index$test, "Set"] <- "test"
   results[index$valid, "Set"] <- "valid"
   
-  g=3
+  if (g<=4){
   ##Iterations
   for(r in 1:g)
   {
@@ -110,20 +111,30 @@ for (k in 1:t){
       label.tracker[miss.iter] <- label.tracker[miss.iter]+1
       results[paste("I", r, ".Label.Num", sep = "")] <- label.tracker
     }
-    
+  } 
   }
   
   #Comparison Consensus Classification
   
-  #Different iterative label vector for each iteration
-  conslabel <- label.selector(labels,rep(4, times = length(labels[,4])))
-  train$data <- data.frame(cbind(conslabel[index$train], train$img))
-  colnames(train$data)[1] <- "label"
-  
-  if (g == 5){
-    r=5
-    table <- data.frame(data.frame(matrix(vector(), 195, 4, 
-                                          dimnames=list(c(), c("train","test","diff", "valid")))))
+  if (g >= 5){
+    #Different iterative label vector for each iteration
+    conslabel <- label.selector(labels,rep(4, times = length(labels[,4])))
+    train$data <- data.frame(cbind(conslabel[index$train], train$img))
+    colnames(train$data)[1] <- "label"
+    
+    for(a in 1:(g-4)){
+      #Different iterative label vector for each iteration
+      conslabel <- label.selector(labels,rep(a, times = length(labels[,1])))
+      train$data <- data.frame(cbind(conslabel[index$train], train$img))
+      colnames(train$data)[1] <- "label"
+      
+      model <- rpart(formula, method = "class", data = train$data, control = ics[a+4])
+      results[paste("A", a, ".Pred", sep = "")] <- 
+        as.integer(predict(model, img_fs, type="class"))
+      models[[a+4]] = model
+    if (a==(g-4)){
+      table <- data.frame(data.frame(matrix(vector(), 195, 4, 
+                                            dimnames=list(c(), c("train","test","diff", "valid")))))
     for(i in 1:195){
       model <- rpart(formula, method = "class", data = train$data, control = tunecontrols[i,])
       results["Max.Pred"] <- 
@@ -138,6 +149,9 @@ for (k in 1:t){
     }
     table["diff"] = table["train"]-table["test"]
     tables[[k]] <- table
+    }
+    }
+
   }
   
   allaccs[[k]] = calcacc(results, index, g)

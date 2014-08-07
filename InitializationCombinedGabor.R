@@ -151,8 +151,11 @@ tunecontrols = expand.grid("minsplit" = ms, "minbucket" = mb, "cp" = 0.01,
                             "maxdepth" =50)
 
 #Controls
-ics = c(rpart.control(minsplit = 170, minbucket= 6),
-            rpart.control(minsplit = 170, minbucket= 6))
+ics = list(rpart.control(minsplit = 170, minbucket= 6),
+            rpart.control(minsplit = 170, minbucket= 6),
+           rpart.control(minsplit = 50, minbucket= 6),
+           rpart.control(minsplit = 110, minbucket= 6),
+           rpart.control(minsplit = 250, minbucket= 58))
 
 ehcontrols = c(rpart.control(minsplit = 510, minbucket= 2, cp = 0.01),
             rpart.control(minsplit = 510, minbucket= 2, cp = 0.01),
