@@ -133,7 +133,7 @@ agg  = avgacc(allaccs)
 View(agg)
 
 for (i in 1:8){
-  pdf(paste("tree", i, ".pdf", sep = ""))
+  png(paste("tree", i, ".png", sep = ""))
   rpart.plot(allmodels[[best.trial]][[i]])
   dev.off()
 }
