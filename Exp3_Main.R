@@ -134,7 +134,33 @@ View(agg)
 
 for (i in 1:8){
   png(paste("tree", i, ".png", sep = ""))
-  rpart.plot(allmodels[[best.trial]][[i]])
+  if (i >=5) {m = paste("Non-Selective Tree", i-4)
+  }else{ m = paste("Selective Tree", i)
+  }
+  tree = allmodels[[best.trial]][[i]]
+  rpart.plot(tree, under = TRUE, extra = 1, 
+             box.col=c("palegreen3", "yellow", "indianred2")[tree$frame$yval],
+             main = m)
   dev.off()
 }
-duplicated(c(best["I1.Pred"], best["I2.Pred"], best["I3.Pred"], best["I4.Pred"]))
+
+pdf("selectiveTrees.pdf")
+par(mfrow=c(2,2))
+for (i in 1:4){
+  tree = allmodels[[best.trial]][[i]]
+  rpart.plot(tree, under = TRUE, extra = 1, 
+             box.col=c("palegreen3", "yellow", "indianred2")[tree$frame$yval],
+             main = paste("Selective Tree", i))
+}
+dev.off()
+
+pdf("nonselectiveTrees.pdf")
+par(mfrow=c(2,2))
+for (i in 5:8){
+  tree = allmodels[[best.trial]][[i]]
+  rpart.plot(tree, under = TRUE, extra =1, 
+             box.col=c("palegreen3", "yellow", "indianred2")[tree$frame$yval],
+             main = paste("Non-Selective Tree", i-4))
+}
+dev.off()
+
