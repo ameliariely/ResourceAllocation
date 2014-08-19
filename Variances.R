@@ -73,4 +73,4 @@ boxplot(sv1, sv2,sv3, sv4, jv4, names = c("1", "2", "3", "4", "all"),
         xlab = "Selective Iteration", ylab = "Assigned Label Variance", col = "orange",
         varwidth = TRUE)
 
-dv = jv4-sv4
+
