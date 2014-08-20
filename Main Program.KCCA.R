@@ -37,7 +37,7 @@ for(k in 1:t)
   train.temp.output <- vector(mode="list",length=4)
   test.temp.output <- vector(mode="list",length=4)
   label.temp.output <- vector(mode="list",length=4)
-  
+
   ## Reshuffle the training and testing datasets at the beginning of each trial
   for(r in 1:4)
   {
