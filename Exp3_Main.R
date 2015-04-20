@@ -147,20 +147,22 @@ for (i in 1:8){
 pdf("selectiveTrees.pdf")
 par(mfrow=c(2,2))
 for (i in 1:4){
+  c=.75
   tree = allmodels[[best.trial]][[i]]
-  rpart.plot(tree, under = TRUE, extra = 1, 
+  rpart.plot(tree, under = TRUE, extra = 2, 
              box.col=c("palegreen3", "yellow", "indianred2")[tree$frame$yval],
-             main = paste("Selective Tree", i))
+             main = paste("Selective Tree", i), cex =c)
 }
 dev.off()
 
 pdf("nonselectiveTrees.pdf")
 par(mfrow=c(2,2))
 for (i in 5:8){
+  c=.75
   tree = allmodels[[best.trial]][[i]]
-  rpart.plot(tree, under = TRUE, extra =1, 
+  rpart.plot(tree, under = TRUE, extra =2, 
              box.col=c("palegreen3", "yellow", "indianred2")[tree$frame$yval],
-             main = paste("Non-Selective Tree", i-4))
+             main = paste("Non-Selective Tree", i-4), cex = c)
 }
 dev.off()
 
